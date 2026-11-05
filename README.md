@@ -6,6 +6,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v910 · Tu volumen personal también cuenta cuando viene de Bonos
+
+- **El ranking personal ahora usa el "Volumen Personal" del Reporte de Bonos** cuando la Línea Descendente no trae el PB del titular. Antes, si tu fila venía sin PB (o no venía), tu producción existía —la veías en Bonos— pero el ranking no tenía de dónde sacarla y quedabas afuera.
+- **Sólo se usa del mismo mes**: el volumen de Bonos de noviembre no se mezcla con el cierre de octubre.
+- **Si tu fila está con 0** en la Línea Descendente pero Bonos dice 47,65, el ranking toma 47,65.
+- **No se duplica**: se toma el mayor número disponible entre el cierre, tu fila y Bonos.
+- Versión: **v910 · Segura** → Cache `appi-v910-ranking-completo`.
+
 ## v909 · El titular entra al ranking y el círculo deja de tapar
 
 - **El titular ya figura en el ranking de PB personales.** Su fila (nivel 0 del reporte de PSA) no forma parte del árbol de personas: vivía sólo en `period.titular`. Por eso, aunque el reporte de bonos mostrara el **volumen personal** (por ejemplo 50 PB), en *Histórico → Rankings del cierre → Personal* no aparecía. Ahora se suma con ese mismo PB, en el puesto que le corresponde.

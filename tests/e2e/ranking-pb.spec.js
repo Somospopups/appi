@@ -247,3 +247,68 @@ test('el titular no se duplica si su fila viene dentro de las personas', async (
   }, rows);
   expect(result.titulares).toBe(1);
 });
+
+// Caso real reportado: el "Volumen Personal" del Reporte de Bonos (47,65) no
+// llegaba al ranking porque la Línea Descendente no trae el PB del titular.
+function lineaSinTitular() {
+  return [
+    ['DIP Nro : 2-98020174  Nombre y Apellido : SILVIA DEL VALLE TOLEDO  Socio : DIAZ,GERMAN EZEQUIEL  Sucursal : 2  Categoría : L  País : Argentina'],
+    ['Período Consultado: Octubre - 2026'],
+    ['', '', '', 'Nombre', 'Cat.', 'Teléfono', 'Estado', 'PB Mes Actual', '1°Mes Ant.', '2°Mes Ant.', '3°Mes Ant.', 'Alta', 'Cumpleaños', 'Correo'],
+    ['', '', '1', '[2-1100001] LODEIRO, ENRIQUE MARIANO [AR-B]', 'D', '', 'C', '24,80', '0', '0', '0', '', '', ''],
+    ['', '', '1', '[2-1100002] MARTTOCCIA, VERONICA ISABEL [AR-B]', 'D', '', 'C', '22,35', '0', '0', '0', '', '', ''],
+    ['', '', '2', '[2-1100003] CONTRERAS, YULIANA EDITH [AR-B]', 'D', '', 'C', '12,80', '0', '0', '0', '', '', '']
+  ];
+}
+const PAR_SIN_TITULAR = [
+  { n: 'LODEIRO, ENRIQUE MARIANO', pb: 24.8 },
+  { n: 'MARTTOCCIA, VERONICA ISABEL', pb: 22.35 },
+  { n: 'CONTRERAS, YULIANA EDITH', pb: 12.8 }
+];
+
+async function importarConBonos(page, { periodoBonos, volumen }) {
+  return page.evaluate(async ({ rows, par, periodoBonos, volumen }) => {
+    if (volumen == null) localStorage.removeItem('appi_bonos_v1');
+    else localStorage.setItem('appi_bonos_v1', JSON.stringify({ ts: Date.now(), bonos: {
+      dip: '2-98020174', nombre: 'SILVIA DEL VALLE TOLEDO', periodo: periodoBonos,
+      acumulacion: [
+        { c: '1', r: 'Volumen Personal', pb: String(volumen), pi: '0.00' },
+        { c: '8', r: 'Lider', pb: '321.75', pi: '0.00' }
+      ]
+    } }));
+    const api = window.__APPI_HISTORICO__;
+    await api.importPSAResponse({
+      periodo: '2026-10', errores: [],
+      linea: { filas: rows, par, pb: par.reduce((sum, item) => sum + item.pb, 0) },
+      garantiasOrg: { filas: [
+        ['Nombre', 'DIP', 'Presentadas', 'Vencidas', '% Vencidas', 'Pendientes'],
+        ['LODEIRO, ENRIQUE MARIANO', '2-1100001', '1', '0', '0', '0']
+      ] },
+      ingresos: { filas: [['Período Consultado Octubre - 2026'], ['Total de 0 ingresos']], resumen: '' }
+    }, { period: '2026-10', deferCloud: true });
+    const period = api.state.periods.find(item => item.id === '2026-10');
+    return {
+      volumenDelCierre: period.titular.pbPersonal,
+      personal: api.simpleRankingList(period, 'personal').map(item => ({ nombre: item.person.nombre, pb: item.value })),
+      pbPersonalVista: api.simpleScopeStats(period, 'personal').pb
+    };
+  }, { rows: lineaSinTitular(), par: PAR_SIN_TITULAR, periodoBonos, volumen });
+}
+
+test('el titular aparece en el ranking aunque su PB venga sólo del Reporte de Bonos', async ({ page }) => {
+  await abrirApp(page);
+  const r = await importarConBonos(page, { periodoBonos: 'Octubre-2026', volumen: '47.65' });
+  // La Línea Descendente no trae su PB...
+  expect(r.volumenDelCierre == null || Number(r.volumenDelCierre) === 0).toBe(true);
+  // ...pero el volumen personal del reporte de bonos sí, y encabeza el ranking.
+  expect(r.personal[0]).toEqual({ nombre: 'SILVIA DEL VALLE TOLEDO', pb: 47.65 });
+  expect(r.personal.map(item => item.nombre)).toContain('LODEIRO, ENRIQUE MARIANO');
+  expect(r.pbPersonalVista).toBe(47.65);
+});
+
+test('el volumen de bonos de otro mes no se mezcla con el cierre', async ({ page }) => {
+  await abrirApp(page);
+  const r = await importarConBonos(page, { periodoBonos: 'Noviembre-2026', volumen: '47.65' });
+  expect(r.personal.map(item => item.nombre)).not.toContain('SILVIA DEL VALLE TOLEDO');
+  expect(r.personal[0]).toEqual({ nombre: 'LODEIRO, ENRIQUE MARIANO', pb: 24.8 });
+});

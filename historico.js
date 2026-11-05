@@ -602,16 +602,42 @@ function simpleOwner(period){
 // PB personal (el mismo "Volumen personal" del reporte de bonos).
 function simpleTitularPerson(period){
   if(!period)return null;
-  const titular=period.titular||{},pb=num(titular.pbPersonal),team=num(period.summary&&period.summary.pbPersonal);
+  const titular=period.titular||{},pb=volumenPersonalTitular(period),team=num(period.summary&&period.summary.pbPersonal);
   return {key:'titular',isTitular:true,nombre:titular.nombre||titular.name||'Titular del reporte',codigo:titular.dip||'',
     cat:(function(){try{return histCategoryCode(titular.categoria||titular.cat)||''}catch(e){return String(titular.categoria||titular.cat||'').toUpperCase()}})(),
     pnAct:pb,teamPB:team,totalPB:pb+team,garantias:{presentadas:0,vencidas:0,pendientes:0}};
 }
+// El "Volumen Personal" del Reporte de Bonos (el número que la persona ve en
+// Mi negocio) es la misma producción personal del cierre. Se usa cuando la
+// Línea Descendente no trae el PB del titular, para que nunca quede afuera.
+function volumenPersonalDelReporteDeBonos(period){
+  try{
+    const guardado=JSON.parse(localStorage.getItem('appi_bonos_v1')||'null');
+    const bonos=guardado&&guardado.bonos;if(!bonos)return null;
+    const partes=String(bonos.periodo||'').toLowerCase().trim().split(/[-\s/]+/);
+    const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    let mes=meses.indexOf(partes[0]);if(mes<0&&partes[0]==='setiembre')mes=8;
+    const anio=Number(partes[1]||0);
+    if(mes<0||!anio)return null;
+    // sólo sirve si el reporte es del mismo mes que el cierre
+    if(Number(period&&period.year)!==anio||Number(period&&period.month)!==mes)return null;
+    const fila=(bonos.acumulacion||[]).find(item=>/volumen\s*personal/i.test(String(item&&item.r||'')));
+    if(!fila)return null;
+    return num(String(fila.pb==null?'':fila.pb).replace(/,/g,''));
+  }catch(e){return null}
+}
+// El mejor número disponible para el PB personal del titular.
+function volumenPersonalTitular(period){
+  const delCierre=num(period&&period.titular&&period.titular.pbPersonal);
+  const deBonos=num(volumenPersonalDelReporteDeBonos(period));
+  const deSuFila=(function(){const p=simpleOwner(period);return p?num(p.pnAct):0})();
+  return Math.max(delCierre,deBonos,deSuFila);
+}
 function simpleTeamPeople(period){const owner=simpleOwner(period);return (period&&period.people||[]).filter(person=>!owner||person.key!==owner.key)}
 function simplePreviousPeriod(period){if(!period)return null;return [...H.periods].filter(item=>item.id<period.id).sort((a,b)=>b.id.localeCompare(a.id))[0]||null}
 function simpleScopeStats(period,scope=H.simpleScope){
-  const ownerEncontrado=simpleOwner(period),owner=ownerEncontrado||simpleTitularPerson(period),hayOwner=!!ownerEncontrado||num(period&&period.titular&&period.titular.pbPersonal)>0,team=simpleTeamPeople(period),summary=period&&period.summary||{},personal=scope==='personal',titularDip=codeNorm(period&&period.titular&&period.titular.dip),direct=titularDip?(period.incomes||[]).filter(item=>codeNorm(item.patrocinanteDip)===titularDip).length:0,teamPresented=team.reduce((sum,p)=>sum+num(p.garantias&&p.garantias.presentadas),0),teamPending=team.reduce((sum,p)=>sum+num(p.garantias&&p.garantias.pendientes),0),teamExpired=team.reduce((sum,p)=>sum+num(p.garantias&&p.garantias.vencidas),0),teamActive=team.filter(p=>num(p.pnAct)>0).length;
-  if(personal)return {pb:hayOwner?num(owner.pnAct):null,activity:hayOwner?(num(owner.pnAct)>0?100:0):null,people:hayOwner?1:0,incomes:direct,presented:hayOwner?num(owner.garantias&&owner.garantias.presentadas):0,pending:hayOwner?num(owner.garantias&&owner.garantias.pendientes):0,expired:hayOwner?num(owner.garantias&&owner.garantias.vencidas):0,active:hayOwner&&num(owner.pnAct)>0?1:0};
+  const ownerEncontrado=simpleOwner(period),owner=ownerEncontrado||simpleTitularPerson(period),hayOwner=!!ownerEncontrado||volumenPersonalTitular(period)>0,team=simpleTeamPeople(period),summary=period&&period.summary||{},personal=scope==='personal',titularDip=codeNorm(period&&period.titular&&period.titular.dip),direct=titularDip?(period.incomes||[]).filter(item=>codeNorm(item.patrocinanteDip)===titularDip).length:0,teamPresented=team.reduce((sum,p)=>sum+num(p.garantias&&p.garantias.presentadas),0),teamPending=team.reduce((sum,p)=>sum+num(p.garantias&&p.garantias.pendientes),0),teamExpired=team.reduce((sum,p)=>sum+num(p.garantias&&p.garantias.vencidas),0),teamActive=team.filter(p=>num(p.pnAct)>0).length;
+  if(personal)return {pb:hayOwner?Math.max(num(owner.pnAct),volumenPersonalTitular(period)):null,activity:hayOwner?(num(owner.pnAct)>0?100:0):null,people:hayOwner?1:0,incomes:direct,presented:hayOwner?num(owner.garantias&&owner.garantias.presentadas):0,pending:hayOwner?num(owner.garantias&&owner.garantias.pendientes):0,expired:hayOwner?num(owner.garantias&&owner.garantias.vencidas):0,active:hayOwner&&num(owner.pnAct)>0?1:0};
   return {pb:hayOwner?num(owner.teamPB):num(summary.pbPersonal),activity:team.length?pct(teamActive,team.length):0,people:team.length,incomes:num(summary.incomeCount),presented:teamPresented,pending:teamPending,expired:teamExpired,active:teamActive};
 }
 function simpleMetricDelta(period,scope,key,suffix='',invert=false){
@@ -652,9 +678,16 @@ function simpleRankingList(period,mode){
   const lista=[...(period&&period.people||[])].map(person=>({person,value:organization?simpleRankingOrganizationValue(period,person):num(person.pnAct)}));
   // El titular entra al ranking con su PB personal (y, en Organización, con el
   // de toda su red). Antes quedaba afuera porque su fila no es parte del árbol.
-  const owner=simpleTitularPerson(period);
-  if(owner&&!titularInPeople(period)&&num(owner.pnAct)>0){
-    lista.push({person:owner,value:organization?Math.max(num(owner.totalPB),num(owner.pnAct)):num(owner.pnAct)});
+  const volumenTitular=volumenPersonalTitular(period);
+  const ownerEnLista=simpleOwner(period);
+  if(ownerEnLista){
+    // su fila sí está en el árbol: se usa el mayor PB entre el del cierre y el
+    // del reporte de bonos (a veces la Línea Descendente trae 0 en su fila).
+    const item=lista.find(entrada=>entrada.person===ownerEnLista);
+    if(item&&!organization&&volumenTitular>item.value)item.value=volumenTitular;
+  }else if(volumenTitular>0){
+    const owner=simpleTitularPerson(period);
+    lista.push({person:owner,value:organization?Math.max(num(owner.totalPB),num(owner.pnAct)):volumenTitular});
   }
   return lista.filter(item=>item.value>0).sort((a,b)=>b.value-a.value).slice(0,10)
 }
@@ -1617,7 +1650,7 @@ async function initHistorico(){
 }
 window.openHistorico=openHistorico;
 window.initHistoricoAPPI=initHistorico;
-window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,parseIngresosRows,saveMonth:saveMonthPeriod,importPSAResponse:importPSAHistoricalResponse,syncPSAPeriod:syncHistoricalPeriod,syncMissingPSAPeriods,syncArchivedPSAYears,expectedHistoricalPeriodIds,expectedArchivedYears,missingHistoricalPeriodIds,simpleScopeStats,simpleRankingList,simpleTitularPerson,analyze:analyzePeriods,strategies:buildStrategies,buildStrategies,affectedForStrategy,reconcileActionPlans,notifyActionDueOnce,openActionCenter,renderActionSummary:actionCenterSummaryHtml,strategyHtml,dbGetAll,annualMatrix,albumMonthStats,ensureAlbumMonth,renderAlbumReadout,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart,navigablePeriods,createAnnualPdf,archiveOldYears:archiveOldYearsInCloud,syncAll,archiveLibraryHtml,downloadArchivePdf};
+window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,parseIngresosRows,saveMonth:saveMonthPeriod,importPSAResponse:importPSAHistoricalResponse,syncPSAPeriod:syncHistoricalPeriod,syncMissingPSAPeriods,syncArchivedPSAYears,expectedHistoricalPeriodIds,expectedArchivedYears,missingHistoricalPeriodIds,simpleScopeStats,simpleRankingList,simpleTitularPerson,volumenPersonalTitular,analyze:analyzePeriods,strategies:buildStrategies,buildStrategies,affectedForStrategy,reconcileActionPlans,notifyActionDueOnce,openActionCenter,renderActionSummary:actionCenterSummaryHtml,strategyHtml,dbGetAll,annualMatrix,albumMonthStats,ensureAlbumMonth,renderAlbumReadout,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart,navigablePeriods,createAnnualPdf,archiveOldYears:archiveOldYearsInCloud,syncAll,archiveLibraryHtml,downloadArchivePdf};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 
