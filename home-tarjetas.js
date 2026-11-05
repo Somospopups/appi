@@ -1129,6 +1129,7 @@
         if (typeof window.showView === 'function') window.showView('view-usuarios');
         setTimeout(function(){ try{ window.APPIMensajes.abrirFila(motivoId); }catch(e){} }, 480);
       }; };
+      var verJornada = function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); };
       // v804: como la tarjeta de reempadronamiento — sin botones por fila.
       // La marca se hace en la tarea (Usuarios) y la fila refleja el estado
       // en color: verde = ya la hice, roja = no la hice, neutra = pendiente.
@@ -1147,6 +1148,18 @@
           items.push(alCarrusel(g.motivo.id));
         });
       });
+      // v913: si no hay diez clientes elegibles, la misma tarjeta se completa
+      // con acciones comerciales reales. Nunca queda en 1–9 ni inventa gente.
+      try{
+        var ra = window.APPIMensajes.resumenAcc ? window.APPIMensajes.resumenAcc() : { acciones:[], map:{} };
+        (ra.acciones || []).forEach(function(a){
+          var cls = ra.map && ra.map[a.id] ? 'ht-hecho' : '';
+          filas.push('<li class="' + cls + '">' +
+            '<span class="ht-li-nom">' + esc(a.ico || '🎯') + ' <b>' + esc(a.txt || '') + '</b></span>' +
+            '<span class="ht-li-meta">Acción comercial</span></li>');
+          items.push(verJornada);
+        });
+      }catch(e){}
       if (!filas.length) return null;
       var todas = r.pendientes === 0;
       var titulo = todas
@@ -1155,7 +1168,7 @@
       return {
         cat: 'usuarios', icono: '💧', kicker: 'Usuarios',
         titulo: titulo,
-        html: '<p class="ht-nota">Verde = ya la hice · Roja = no la hice. Se colorean al marcarlas en la tarea.</p>' +
+        html: '<p class="ht-nota"><b>' + (r.clientes || 0) + ' con usuarios + ' + (r.comerciales || 0) + ' comerciales.</b> Verde = hecha · Roja = no realizada.</p>' +
               '<ul class="ht-lista">' + filas.join('') + '</ul>' +
               '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>',
         items: items,

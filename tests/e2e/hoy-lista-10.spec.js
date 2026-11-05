@@ -114,10 +114,10 @@ async function marcarYVolver(page, marcas) {
 test('el listado se muestra completo, sin botones, y la ✓ de la tarea lo pinta verde', async ({ page }) => {
   await entrar(page);
   const total = await page.evaluate(() => window.APPIMensajes.resumenHoy().total);
-  expect(total).toBe(3);
+  expect(total).toBe(10);
   await irATarjetaHoy(page);
-  // Las 3 personas del día, persona por persona, siempre visibles.
-  await expect(topCard(page).locator('.ht-lista li')).toHaveCount(3);
+  // Las 3 personas reales y 7 acciones comerciales completan la jornada.
+  await expect(topCard(page).locator('.ht-lista li')).toHaveCount(10);
   await expect(topCard(page)).toContainText('Gomez');
   await expect(topCard(page)).toContainText('Ruiz');
   await expect(topCard(page)).toContainText('Diaz');
@@ -132,7 +132,8 @@ test('el listado se muestra completo, sin botones, y la ✓ de la tarea lo pinta
   await expect(topCard(page).locator('.ht-chips')).toContainText('✓ 1');
   const st = await page.evaluate(() => window.APPIMensajes.resumenHoy());
   expect(st.hechas).toBe(1);
-  expect(st.pendientes).toBe(2);
+  expect(st.pendientes).toBe(9);
+  expect(st).toMatchObject({ clientes: 3, comerciales: 7 });
 });
 
 test('la ✗ de la tarea pinta la fila roja y tocarla abre el carrusel', async ({ page }) => {

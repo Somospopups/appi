@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v913 · Jornada garantizada de 10 tareas útiles
+
+- La jornada diaria ahora tiene **exactamente 10 tareas útiles**: primero usa clientes realmente elegibles y completa los lugares libres con acciones comerciales concretas.
+- **No inventa ni repite contactos** para llegar a diez. Las personas asignadas avanzan por una cola de rotación aunque la tarea anterior quede pendiente.
+- La lista del día queda persistida: no se reordena al recargar y se combina de forma determinística entre dispositivos, titular y socio.
+- Se corrigió el cálculo vacío que podía quedar memorizado antes de que MI PSA terminara de cargar, y el recálculo al cambiar de fecha.
+- La tarjeta de inicio y la franja de Usuarios muestran juntas las tareas con clientes y las acciones comerciales, con su progreso real.
+- Versión: **v913 · Segura** → Cache `appi-v913-jornada-10`.
+
 ## v912 · El titular también entra al ranking del Tablero
 
 - **El ranking de ventas del Tablero** (`Mi negocio → Tablero`, con sus pestañas Personal y Organización y los cumpleaños debajo) es **otro componente**: se arma con la Línea Descendente, donde la fila del titular (nivel 0) no viene. Por eso el titular no aparecía **aunque sus datos ya estuvieran cargados** — las correcciones anteriores tocaban el ranking del Histórico, no éste.

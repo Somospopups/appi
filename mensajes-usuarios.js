@@ -533,39 +533,99 @@
     return h.getFullYear() + '-' + String(h.getMonth()+1).padStart(2,'0') + '-' + String(h.getDate()).padStart(2,'0');
   }
 
-  /* Acciones comerciales del día (v798): la red de seguridad para que la
-     pantalla NUNCA se quede en blanco. Si la jornada no tiene tareas de
-     clientes (distribuidor nuevo sin garantías en PSA, o el día se
-     agotó), el panel Hoy muestra estas acciones con su ✓. Hacerlas todas
-     gana el partido del día y mantiene la racha. */
+  /* Acciones comerciales de respaldo (v913): la jornada siempre suma diez
+     acciones útiles. Primero entran los clientes realmente elegibles; estos
+     elementos completan solamente los lugares que falten, sin repetir ni
+     inventar contactos. La rotación diaria evita mostrar siempre el mismo
+     bloque cuando una cuenta todavía tiene pocos usuarios. */
   var ACCIONES_DIA = [
-    { id: 'llamadas',  ico: '📞', txt: 'Hacer 3 llamados a prospectos o conocidos' },
-    { id: 'referidos', ico: '🗣️', txt: 'Pedir 2 referidos a clientes satisfechos' },
-    { id: 'demo',      ico: '💧', txt: 'Ofrecer / agendar 1 demostración de purificador' },
-    { id: 'negocio',   ico: '💼', txt: 'Presentar la oportunidad de negocio a 1 persona' },
-    { id: 'stock',     ico: '📦', txt: 'Revisar entregas y stock personal' }
+    { id: 'llamadas',     ico: '📞', txt: 'Hacer 3 llamados a prospectos o conocidos' },
+    { id: 'referidos',    ico: '🗣️', txt: 'Pedir 2 referidos a clientes satisfechos' },
+    { id: 'demo',         ico: '💧', txt: 'Ofrecer o agendar 1 demostración de purificador' },
+    { id: 'negocio',      ico: '💼', txt: 'Presentar la oportunidad de negocio a 1 persona' },
+    { id: 'stock',        ico: '📦', txt: 'Revisar entregas y stock personal' },
+    { id: 'panel',        ico: '📇', txt: 'Resolver 1 seguimiento pendiente del Panel de Contactos' },
+    { id: 'margarita',    ico: '🌼', txt: 'Agregar 3 nombres nuevos a Mi Margarita' },
+    { id: 'encuesta',     ico: '📋', txt: 'Compartir Mi Encuesta con 1 persona' },
+    { id: 'reactivacion', ico: '🔥', txt: 'Revisar 1 contacto dormido para reactivar' },
+    { id: 'agenda',       ico: '🗓️', txt: 'Definir las 3 prioridades de mañana' },
+    { id: 'presupuesto',  ico: '🧾', txt: 'Revisar 1 presupuesto que quedó pendiente' },
+    { id: 'posventa',     ico: '🤝', txt: 'Hacer 1 seguimiento de posventa reciente' },
+    { id: 'contenido',    ico: '📲', txt: 'Compartir 1 contenido útil sobre agua segura' },
+    { id: 'campus',       ico: '🎓', txt: 'Completar 1 contenido breve del Campus PSA' },
+    { id: 'objetivo',     ico: '🎯', txt: 'Revisar el objetivo del mes y elegir el próximo paso' },
+    { id: 'equipo',       ico: '👥', txt: 'Acompañar a 1 integrante del equipo' },
+    { id: 'testimonio',   ico: '⭐', txt: 'Pedir 1 testimonio a un cliente satisfecho' },
+    { id: 'invitacion',   ico: '💌', txt: 'Invitar a 1 persona a conocer una demostración' },
+    { id: 'orden',        ico: '📝', txt: 'Actualizar notas de 3 contactos' },
+    { id: 'entrega',      ico: '🚚', txt: 'Revisar la próxima entrega o instalación' }
   ];
   function diaHoyRef(){
     var d = leerAcciones();
     if (!d.dias) d.dias = {};
     var k = hoyKey();
     if (!d.dias[k]) d.dias[k] = { marcas: {} };
+    if (!d.dias[k].marcas) d.dias[k].marcas = {};
     if (!d.dias[k].acc) d.dias[k].acc = {};
-    return { d: d, k: k };
+    return { d: d, k: k, dia: d.dias[k] };
   }
-  function resumenAcc(){
+  function accionDiaPorId(id){
+    for (var i=0;i<ACCIONES_DIA.length;i++) if (ACCIONES_DIA[i].id === id) return ACCIONES_DIA[i];
+    return null;
+  }
+  function totalGrupos(grupos){
+    return (grupos || []).reduce(function(n, g){ return n + ((g && g.gente && g.gente.length) || 0); }, 0);
+  }
+  function accionesRelleno(limite, grupos){
+    limite = Number(limite);
+    if (!isFinite(limite) || limite <= 0) limite = cupoHoy();
+    limite = Math.floor(limite);
+    grupos = grupos || deHoy(limite);
+    var faltan = Math.max(0, limite - totalGrupos(grupos));
+    if (!faltan) return [];
     var ref = diaHoyRef();
-    var acc = ref.d.dias[ref.k].acc;
+    var ids = Array.isArray(ref.dia.relleno) ? ref.dia.relleno.filter(function(id){ return !!accionDiaPorId(id); }) : [];
+    var vistos = {};
+    ids = ids.filter(function(id){ if (vistos[id]) return false; vistos[id] = true; return true; });
+    var semilla = Math.abs(Math.floor(hoy().getTime() / 86400000) * CUPO_DIA) % ACCIONES_DIA.length;
+    for (var i=0; ids.length < faltan && i<ACCIONES_DIA.length; i++){
+      var id = ACCIONES_DIA[(semilla + i) % ACCIONES_DIA.length].id;
+      if (!vistos[id]){ vistos[id] = true; ids.push(id); }
+    }
+    var antes = JSON.stringify(ref.dia.relleno || []);
+    ref.dia.relleno = ids;
+    if (JSON.stringify(ids) !== antes) guardarAcciones(ref.d);
+    return ids.slice(0, faltan).map(accionDiaPorId).filter(Boolean);
+  }
+  function resumenAcc(limite, grupos){
+    var ref = diaHoyRef();
+    var acc = ref.dia.acc;
+    var acciones = accionesRelleno(limite, grupos);
     var hechas = 0;
     var map = {};
-    ACCIONES_DIA.forEach(function(a){ map[a.id] = !!acc[a.id]; if (acc[a.id]) hechas++; });
-    return { total: ACCIONES_DIA.length, hechas: hechas, noHechas: 0, pendientes: ACCIONES_DIA.length - hechas, map: map };
+    acciones.forEach(function(a){ map[a.id] = !!acc[a.id]; if (acc[a.id]) hechas++; });
+    return { total: acciones.length, hechas: hechas, noHechas: 0, pendientes: acciones.length - hechas, map: map, acciones: acciones };
   }
   function toggleAccionDia(id){
+    if (!accionDiaPorId(id)) return false;
     var ref = diaHoyRef();
-    var acc = ref.d.dias[ref.k].acc;
+    var acc = ref.dia.acc;
     if (acc[id]) delete acc[id]; else acc[id] = true;
     guardarAcciones(ref.d);
+    // El resumen debe quedar correcto aunque la acción se marque desde otro
+    // módulo y no llegue a repintarse inmediatamente la vista Usuarios.
+    try{
+      var r = resumenHoy();
+      var actualizado = leerAcciones();
+      if (actualizado.dias && actualizado.dias[ref.k]){
+        actualizado.dias[ref.k].total = r.total;
+        actualizado.dias[ref.k].hechas = r.hechas;
+        actualizado.dias[ref.k].noHechas = r.noHechas;
+        actualizado.dias[ref.k].ganado = !!(r.total && r.hechas === r.total);
+        guardarAcciones(actualizado);
+      }
+    }catch(e){}
+    try{ if (window.APPICampusPSA && window.APPICampusPSA.revisarJornada) window.APPICampusPSA.revisarJornada(); }catch(e){}
     return !!acc[id];
   }
 
@@ -599,6 +659,24 @@
         (cumple ? String(cumple.getMonth()+1).padStart(2,'0') + '-' + String(cumple.getDate()).padStart(2,'0') : 'sin-fecha');
     }
     return base;
+  }
+
+  /* La cola rotativa registra que una persona ya fue seleccionada para ese
+     motivo/ciclo, aunque haya quedado pendiente. Así los diez de mañana son
+     los que siguen y una tarea no resuelta no bloquea eternamente al resto. */
+  function asignadaAntesDeHoy(motivoId, u){
+    var clave = claveAccion(motivoId, u);
+    if (!clave) return false;
+    var d = leerAcciones();
+    var dia = d.asignadas && d.asignadas[clave];
+    if (dia && typeof dia === 'object') dia = dia.dia;
+    return !!(dia && String(dia) < hoyKey());
+  }
+  function registrarAsignacion(d, motivoId, u){
+    var clave = claveAccion(motivoId, u);
+    if (!clave) return;
+    if (!d.asignadas) d.asignadas = {};
+    if (!d.asignadas[clave]) d.asignadas[clave] = hoyKey();
   }
 
   function fechaDeMotivo(motivoId, u){
@@ -776,9 +854,13 @@
     try{ if (window.APPICampusPSA && window.APPICampusPSA.revisarJornada) window.APPICampusPSA.revisarJornada(); }catch(e){}
   }
   function resumenCon(d, limite){
+    limite = Number(limite);
+    if (!isFinite(limite) || limite <= 0) limite = cupoHoy();
+    limite = Math.floor(limite);
     var marcas = (d.dias && d.dias[hoyKey()] && d.dias[hoyKey()].marcas) || {};
     var total = 0, hechas = 0, noHechas = 0, pendientes = 0;
-    deHoy(limite).forEach(function(g){
+    var grupos = deHoy(limite);
+    grupos.forEach(function(g){
       g.gente.forEach(function(u){
         total++;
         var m = marcas[g.motivo.id + ':' + telefonoDe(u)];
@@ -787,7 +869,10 @@
         else pendientes++;
       });
     });
-    return { total: total, hechas: hechas, noHechas: noHechas, pendientes: pendientes };
+    var extra = resumenAcc(limite, grupos);
+    total += extra.total; hechas += extra.hechas; noHechas += extra.noHechas; pendientes += extra.pendientes;
+    return { total: total, hechas: hechas, noHechas: noHechas, pendientes: pendientes,
+      clientes: totalGrupos(grupos), comerciales: extra.total };
   }
   function resumenHoy(){ return resumenCon(leerAcciones()); }
   // Resumen fijo de la jornada original. Campus usa este contrato para
@@ -795,7 +880,7 @@
   function resumenBaseHoy(){ return resumenCon(leerAcciones(), CUPO_DIA); }
   /* deHoy() recorre toda la planilla. Sin memo, el mazo lo llamaba
      una vez por cliente (enJornada) y el Home se clavaba. */
-  var jornadaMemo = { gen: 0, genHecho: -1, porCupo: {}, tels: null };
+  var jornadaMemo = { gen: 0, genHecho: -1, porCupo: {}, tels: null, dia: '', cantidadUsuarios: -1 };
 
   /* Partido del día (v398): el marcador es hechas / las que hay.
      Ganar es hacerlas todas (✓). La ✗ no cuenta. Un día sin tareas
@@ -950,7 +1035,8 @@
   }
   function candidatosDe(motivo){
     return listaUsuarios().filter(function(u){
-      return telefonoDe(u) && motivo.aplica(u) && !completadaAntesDeHoy(motivo.id, u);
+      return telefonoDe(u) && motivo.aplica(u) &&
+        !completadaAntesDeHoy(motivo.id, u) && !asignadaAntesDeHoy(motivo.id, u);
     });
   }
   function ordenarPorUrgencia(motivo, gente){
@@ -984,32 +1070,81 @@
   }
 
   // Las 10 acciones base del día, o hasta 13 cuando Campus habilitó el
-  // Impulso. El parámetro permite leer siempre las primeras 10 originales.
+  // Impulso. La selección queda guardada: recargar, sincronizar o cambiar de
+  // dispositivo no reordena la jornada. Al día siguiente se toman los que
+  // siguen en la cola, incluso si alguna tarea anterior quedó sin marcar.
   function deHoy(limite){
     limite = Number(limite);
     if (!isFinite(limite) || limite <= 0) limite = cupoHoy();
     limite = Math.floor(limite);
+
+    var usuarios = listaUsuarios();
+    var diaActual = hoyKey();
+    // Dos causas históricas de la jornada vacía: el día cambiaba sin limpiar
+    // el memo, o el primer cálculo ocurría antes de que MI PSA cargara gente.
+    if (jornadaMemo.dia !== diaActual || jornadaMemo.cantidadUsuarios !== usuarios.length){
+      jornadaMemo.gen++;
+      jornadaMemo.porCupo = {};
+      jornadaMemo.tels = null;
+      jornadaMemo.dia = diaActual;
+      jornadaMemo.cantidadUsuarios = usuarios.length;
+    }
     var cache = jornadaMemo.porCupo[limite];
     if (jornadaMemo.genHecho === jornadaMemo.gen && cache) return cache;
+
+    var porTelefono = {};
+    usuarios.forEach(function(u){ var t = telefonoDe(u); if (t && !porTelefono[t]) porTelefono[t] = u; });
     var usados = {};
-    var grupos = [];
-    function tomar(motivo, max){
-      if (!motivo || max === 0) return 0;
-      var gente = ordenarPorUrgencia(motivo, candidatosDe(motivo)).filter(function(u){
-        var t = telefonoDe(u);
-        return t && !usados[t];
-      });
-      if (max != null && max >= 0) gente = gente.slice(0, max);
-      if (!gente.length) return 0;
-      gente.forEach(function(u){ usados[telefonoDe(u)] = true; });
-      grupos.push({ motivo: motivo, gente: gente });
-      return gente.length;
-    }
-    var faltan = limite;
-    ['cumple', 'porvencer', 'retro', 'renovacion', 'checkin'].forEach(function(id){
-      if (faltan <= 0) return;
-      faltan -= tomar(motivoPorId(id), faltan);
+    var elegidos = [];
+    var datos = leerAcciones();
+    if (!datos.dias) datos.dias = {};
+    if (!datos.dias[diaActual]) datos.dias[diaActual] = { marcas: {} };
+    var dia = datos.dias[diaActual];
+    if (!dia.marcas) dia.marcas = {};
+
+    // Recupera primero la lista ya fijada para hoy.
+    var guardada = Array.isArray(dia.lista) ? dia.lista : [];
+    guardada.forEach(function(ref){
+      if (elegidos.length >= limite) return;
+      var motivo = motivoPorId(ref && ref.m);
+      var tel = String(ref && ref.t || '');
+      var u = porTelefono[tel];
+      if (!motivo || !u || usados[tel]) return;
+      usados[tel] = true;
+      elegidos.push({ motivo: motivo, u: u });
     });
+
+    function tomar(motivo){
+      if (!motivo || elegidos.length >= limite) return;
+      var gente = ordenarPorUrgencia(motivo, candidatosDe(motivo));
+      for (var i=0;i<gente.length && elegidos.length<limite;i++){
+        var u = gente[i], tel = telefonoDe(u);
+        if (!tel || usados[tel]) continue;
+        usados[tel] = true;
+        elegidos.push({ motivo: motivo, u: u });
+      }
+    }
+    ['cumple', 'porvencer', 'retro', 'renovacion', 'checkin'].forEach(function(id){ tomar(motivoPorId(id)); });
+
+    // Agrupa para la UI sin perder el orden de prioridad.
+    var grupos = [];
+    ['cumple', 'porvencer', 'retro', 'renovacion', 'checkin'].forEach(function(id){
+      var motivo = motivoPorId(id);
+      var gente = elegidos.filter(function(x){ return x.motivo.id === id; }).map(function(x){ return x.u; });
+      if (gente.length) grupos.push({ motivo: motivo, gente: gente });
+    });
+
+    // Sólo fija asignaciones cuando ya existe una fuente real de usuarios. Un
+    // arranque todavía vacío puede recalcularse apenas llegue MI PSA.
+    if (usuarios.length){
+      dia.lista = elegidos.map(function(x){
+        registrarAsignacion(datos, x.motivo.id, x.u);
+        return { m:x.motivo.id, ico:x.motivo.icono, mot:x.motivo.nombre,
+          n:String((x.u.usuario || x.u.nombre) || '').slice(0,60), t:telefonoDe(x.u) };
+      });
+      guardarAcciones(datos);
+    }
+
     jornadaMemo.porCupo[limite] = grupos;
     jornadaMemo.tels = null;
     jornadaMemo.genHecho = jornadaMemo.gen;
@@ -1117,12 +1252,15 @@
       ? 'Hoy ganaste · ' + p.hechas + ' / ' + p.total
       : 'Hoy ' + p.hechas + ' / ' + p.total;
     var subRacha = rachaTxt ? ' · ' + rachaTxt : '';
+    var accHoy = resumenAcc(cupoHoy(), grupos);
     var html = '<div class="mu-hoy-top"><span class="mu-hoy-ico">📋</span>' +
       '<div class="mu-hoy-heading"><b>' + titulo + '</b>' +
       '<span class="mu-hoy-fecha">📅 ' + esc(fmtFecha(hoy())) + esc(subRacha) + '</span></div>' +
       '<span class="mu-hoy-res"><i class="ok">✓ ' + res.hechas + '</i><i class="no">✗ ' + res.noHechas + '</i>' +
       (res.pendientes ? '<i>quedan ' + res.pendientes + '</i>' : '') + '</span></div>' +
-      '<div class="mu-hoy-list">';
+      '<div class="mu-hoy-list">' +
+      '<div style="font-size:11px;color:#777b88;padding:2px 4px 8px"><b>' + totalGrupos(grupos) +
+      ' con usuarios</b> · ' + accHoy.total + ' acciones comerciales · siempre ' + res.total + ' tareas</div>';
     grupos.forEach(function(g){
       var sinMarca = g.gente.filter(function(u){ return !marcaDe(g.motivo.id, u); }).length;
       var hechas = g.gente.filter(function(u){ var m = marcaDe(g.motivo.id, u); return m && m.e === 'hecha'; }).length;
@@ -1149,17 +1287,36 @@
           estado + '<span class="mu-hoy-go">✓</span></div>';
       }
     });
+    accHoy.acciones.forEach(function(a){
+      if (accHoy.map[a.id]){
+        html += '<button type="button" class="mu-hoy-item done" data-mu-acc="' + a.id + '">' +
+          '<span class="mu-hoy-n">' + a.ico + '</span>' +
+          '<span class="mu-hoy-txt"><span style="font-weight:700">' + esc(a.txt) + ' · hecha</span></span>' +
+          '<span class="mu-hoy-est"><i class="ok">✓</i></span><span class="mu-hoy-go">✓</span></button>';
+      } else {
+        html += '<button type="button" class="mu-hoy-item" data-mu-acc="' + a.id + '">' +
+          '<span class="mu-hoy-n">' + a.ico + '</span>' +
+          '<span class="mu-hoy-txt"><span style="font-weight:700">' + esc(a.txt) + '</span></span>' +
+          '<span class="mu-hoy-est"></span><span class="mu-hoy-go">✓</span></button>';
+      }
+    });
     html += '</div>';
     host.innerHTML = html;
     host.querySelectorAll('[data-mu-hoy]').forEach(function(b){
       b.onclick = function(){ abrirFila(b.getAttribute('data-mu-hoy')); };
     });
+    host.querySelectorAll('[data-mu-acc]').forEach(function(b){
+      b.onclick = function(){
+        toggleAccionDia(b.getAttribute('data-mu-acc'));
+        try{ pintarHoy(); }catch(e){}
+      };
+    });
   }
 
-  // Al cambiar el día, la franja se rearma sola con las acciones nuevas.
+  // Al cambiar el día, la franja se rearma sola con acciones nuevas.
   setInterval(function(){
     if (diaPintado && diaPintado !== hoyKey()){
-      try{ pintarHoy(); }catch(e){}
+      try{ invalidarJornada(); pintarHoy(); }catch(e){}
     }
   }, 60000);
 
@@ -2213,7 +2370,9 @@
     cont.__muObs = true;
     var mo = new MutationObserver(function(){
       pintarFichas();
-      // Cambiar de archivo o de filtro cambia quién está pendiente.
+      // La carga automática de MI PSA puede terminar después del primer
+      // cálculo. Siempre se descarta el memo antes de repintar la jornada.
+      invalidarJornada();
       pintarHoy();
     });
     mo.observe(cont, { childList:true, subtree:true });
@@ -2300,6 +2459,7 @@
     partidoHoy: partidoHoy,
     registrarPartido: registrarPartido,
     ACCIONES_DIA: ACCIONES_DIA,
+    accionesRelleno: accionesRelleno,
     resumenAcc: resumenAcc,
     toggleAccionDia: toggleAccionDia,
     rachaGanados: rachaGanados,

@@ -66,18 +66,52 @@ function mergeAccionesValue(left,right){
   new Set([...Object.keys(a.completadas||{}),...Object.keys(b.completadas||{})]).forEach(k=>{
     completadas[k]=newerMarca((a.completadas||{})[k],(b.completadas||{})[k]);
   });
+  // v913: la rotación también es de la cuenta. Titular y socio comparten qué
+  // personas ya fueron asignadas, incluso cuando la tarea quedó pendiente.
+  const asignadas={};
+  new Set([...Object.keys(a.asignadas||{}),...Object.keys(b.asignadas||{})]).forEach(k=>{
+    const x=(a.asignadas||{})[k],y=(b.asignadas||{})[k];
+    const dx=typeof x==='object'&&x?x.dia:x,dy=typeof y==='object'&&y?y.dia:y;
+    asignadas[k]=String(dx||'')>=String(dy||'')?x:y;
+  });
+  const mergeLista=(x,y,key)=>{
+    const xa=Array.isArray(x&&x[key])?x[key]:[],ya=Array.isArray(y&&y[key])?y[key]:[];
+    const id=v=>key==='lista'?String(v&&v.m||'')+':'+String(v&&v.t||''):String(v||'');
+    const limpiar=arr=>{const seen=new Set();return arr.filter(v=>{const k=id(v);if(!k||seen.has(k))return false;seen.add(k);return true})};
+    const ax=limpiar(xa),ay=limpiar(ya),kx=ax.map(id),ky=ay.map(id),limite=key==='lista'?13:20;
+    if(!ax.length)return ay.slice(0,limite);
+    if(!ay.length)return ax.slice(0,limite);
+    if(kx.length===ky.length&&kx.every((k,i)=>k===ky[i]))return ax.slice(0,limite);
+    const sx=new Set(kx),sy=new Set(ky);
+    if(kx.every(k=>sy.has(k)))return ay.slice(0,limite);
+    if(ky.every(k=>sx.has(k)))return ax.slice(0,limite);
+    // Dos equipos pudieron crear la jornada antes de sincronizar. La unión se
+    // ordena de forma estable para que ambos terminen viendo exactamente lo mismo.
+    const porId=new Map();
+    [...ax,...ay].forEach(v=>{const k=id(v),prev=porId.get(k);if(!prev||JSON.stringify(v)<JSON.stringify(prev))porId.set(k,v)});
+    const orden={cumple:0,porvencer:1,retro:2,renovacion:3,checkin:4};
+    return [...porId.values()].sort((p,q)=>{
+      if(key!=='lista')return id(p).localeCompare(id(q));
+      return (orden[p&&p.m]??9)-(orden[q&&q.m]??9)||String(p&&p.t||'').localeCompare(String(q&&q.t||''));
+    }).slice(0,limite);
+  };
   const dias={};
   new Set([...Object.keys(a.dias||{}),...Object.keys(b.dias||{})]).forEach(k=>{
     const x=(a.dias||{})[k]||{},y=(b.dias||{})[k]||{},marcas={};
     new Set([...Object.keys(x.marcas||{}),...Object.keys(y.marcas||{})]).forEach(m=>{
       marcas[m]=newerMarca((x.marcas||{})[m],(y.marcas||{})[m]);
     });
+    const acc={...(x.acc||{})};
+    Object.keys(y.acc||{}).forEach(id=>{if(y.acc[id])acc[id]=true});
+    const lista=mergeLista(x,y,'lista'),relleno=mergeLista(x,y,'relleno');
     let hechas=0,noHechas=0;
     Object.keys(marcas).forEach(m=>{const e=marcas[m]&&marcas[m].e;if(e==='hecha')hechas++;else if(e==='no_hecha')noHechas++;});
-    const total=Math.max(Number(x.total)||0,Number(y.total)||0,Object.keys(marcas).length);
-    dias[k]={marcas,total,hechas,noHechas,ganado:!!(total&&hechas===total)};
+    hechas+=relleno.filter(id=>!!acc[id]).length;
+    const jornadaGarantizada=Array.isArray(x.relleno)||Array.isArray(y.relleno);
+    const total=Math.max(Number(x.total)||0,Number(y.total)||0,Object.keys(marcas).length+relleno.length,jornadaGarantizada?10:0);
+    dias[k]={marcas,acc,lista,relleno,total,hechas,noHechas,ganado:!!(total&&hechas===total)};
   });
-  return JSON.stringify({dias,completadas});
+  return JSON.stringify({dias,completadas,asignadas});
 }
 function rememberLegacyAcciones(cloudKeys,personType=state.personType){
   (cloudKeys||[]).forEach(cloudKey=>{
