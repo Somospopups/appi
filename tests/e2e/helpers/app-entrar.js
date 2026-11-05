@@ -51,7 +51,7 @@ async function entrar(page, { usuarios = USUARIOS } = {}) {
   await page.addInitScript((items) => {
     // Las regresiones generales prueban el catálogo base fuera de campañas.
     // Un spec de promoción puede fijar antes su propia fecha y esta no la pisa.
-    if (!window.__APPI_FECHA_PROMO__) window.__APPI_FECHA_PROMO__ = '2026-11-05';
+    if (!window.__APPI_FECHA_PROMO__) window.__APPI_FECHA_PROMO__ = '2026-11-09';
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');

@@ -2,9 +2,7 @@
   "legales-financiacion-vigencia_2-11-2026.pdf": {
     "vigencia": "2-Nov-2026 al 11-Nov-2026",
     "cuotas": [
-      2,
       3,
-      5,
       6,
       9,
       12,
@@ -13,25 +11,6 @@
       24
     ],
     "bancos": [
-      {
-        "id": "cuota-simple",
-        "nombre": "Cuota Simple",
-        "cuotas": [
-          3,
-          6,
-          9,
-          12,
-          15,
-          18
-        ],
-        "tarjetas": "Visa, Mastercard y Cordobesa Mastercard",
-        "desde": "2026-11-02",
-        "hasta": "2026-11-11",
-        "vigencia": "2 al 11 de noviembre de 2026",
-        "beneficio": "3, 6, 9, 12, 15 y 18 cuotas sin interés",
-        "canal": "Exclusivo a través de MODO",
-        "condiciones": "No aplica a tarjetas emitidas por BBVA, Santander, Galicia, Banco Nación, Macro ni Hipotecario."
-      },
       {
         "id": "tarjeta-naranja",
         "nombre": "Naranja X",
@@ -135,21 +114,23 @@
         "canal": "Exclusivo a través de MODO"
       },
       {
-        "id": "cabal",
-        "nombre": "Cabal / Credicoop",
+        "id": "cuota-simple",
+        "nombre": "Cuota Simple",
         "cuotas": [
           3,
           6,
           9,
           12,
+          15,
           18
         ],
-        "tarjetas": "Cabal emitida por Banco Credicoop",
+        "tarjetas": "Visa, Mastercard y Cordobesa Mastercard",
         "desde": "2026-11-02",
-        "hasta": "2026-11-04",
-        "vigencia": "2 al 4 de noviembre de 2026",
-        "beneficio": "3, 6, 9 y 12 cuotas sin interés + 10% de reintegro sin tope; o 18 cuotas sin interés sin descuento",
-        "canal": "Exclusivo a través de MODO"
+        "hasta": "2026-11-11",
+        "vigencia": "2 al 11 de noviembre de 2026",
+        "beneficio": "3, 6, 9, 12, 15 y 18 cuotas sin interés",
+        "canal": "Exclusivo a través de MODO",
+        "condiciones": "No aplica a tarjetas emitidas por BBVA, Santander, Galicia, Banco Nación, Macro ni Hipotecario."
       },
       {
         "id": "banco-nacion",
@@ -200,80 +181,24 @@
         "canal": "Exclusivo a través de MODO"
       },
       {
-        "id": "tarjeta-patagonia-365",
-        "nombre": "Patagonia 365",
-        "cuotas": [
-          3,
-          6,
-          12
-        ],
-        "tarjetas": "Patagonia 365",
-        "desde": "2026-11-02",
-        "hasta": "2026-11-11",
-        "vigencia": "2 al 11 de noviembre de 2026",
-        "beneficio": "3, 6 y 12 cuotas sin interés",
-        "canal": "Medios habilitados por PSA"
-      },
-      {
-        "id": "tarjeta-tuya",
-        "nombre": "Tuya",
-        "cuotas": [
-          3,
-          5,
-          9
-        ],
-        "tarjetas": "Tuya NBCH",
-        "desde": "2026-11-02",
-        "hasta": "2026-11-11",
-        "vigencia": "2 al 11 de noviembre de 2026",
-        "beneficio": "3, 5 y 9 cuotas sin interés",
-        "canal": "Medios habilitados por PSA"
-      },
-      {
-        "id": "tarjeta-data",
-        "nombre": "Data",
-        "cuotas": [
-          2,
-          3,
-          6
-        ],
-        "tarjetas": "Tarjeta Data",
-        "desde": "2026-11-02",
-        "hasta": "2026-11-11",
-        "vigencia": "2 al 11 de noviembre de 2026",
-        "beneficio": "2, 3 y 6 cuotas sin interés",
-        "canal": "Medios habilitados por PSA"
-      },
-      {
-        "id": "banco-del-sol",
-        "nombre": "Banco del Sol",
-        "cuotas": [
-          15,
-          18
-        ],
-        "tarjetas": "Mastercard Banco del Sol",
-        "desde": "2026-11-02",
-        "hasta": "2026-11-11",
-        "vigencia": "2 al 11 de noviembre de 2026",
-        "beneficio": "15 y 18 cuotas sin interés",
-        "canal": "Medios habilitados por PSA"
-      },
-      {
-        "id": "tarjeta-sol",
-        "nombre": "Tarjeta Sol",
+        "id": "cabal",
+        "nombre": "Credicoop / Cabal",
         "cuotas": [
           3,
           6,
           9,
-          12
+          12,
+          18
         ],
-        "tarjetas": "Tarjeta Sol",
-        "desde": "2026-11-02",
+        "tarjetas": "Cabal emitida por Banco Credicoop",
+        "desde": "2026-11-05",
         "hasta": "2026-11-11",
-        "vigencia": "2 al 11 de noviembre de 2026",
-        "beneficio": "3, 6, 9 y 12 cuotas sin interés",
-        "canal": "Medios habilitados por PSA"
+        "vigencia": "5 al 11 de noviembre de 2026",
+        "beneficio": "3, 6, 9, 12 y 18 cuotas sin interés",
+        "canal": "Exclusivo a través de MODO",
+        "condiciones": "Promoción vigente desde el 5 de noviembre; no incluye reintegro."
       }
-    ]
+    ],
+    "fuente_actualizacion": "Piezas oficiales PSA CyberWeek recibidas el 5-Nov-2026"
   }
 }

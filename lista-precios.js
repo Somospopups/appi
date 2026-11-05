@@ -163,6 +163,14 @@
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
   }
+  function promoRango(campana) {
+    var desde = String((campana && campana.desde) || '').split('-');
+    var hasta = String((campana && campana.hasta) || '').split('-');
+    if (desde.length < 3 || hasta.length < 3) return '';
+    var d1 = Number(desde[2]), d2 = Number(hasta[2]);
+    var m1 = Number(desde[1]), m2 = Number(hasta[1]);
+    return m1 === m2 ? (d1 + ' al ' + d2 + '/' + m2) : (d1 + '/' + m1 + ' al ' + d2 + '/' + m2);
+  }
   function beneficioProducto(p, modalidad) {
     if (!p || !BENEFICIOS || !Array.isArray(BENEFICIOS.campanas)) return null;
     var hoy = fechaArgentinaISO();
@@ -178,7 +186,11 @@
         if (modalidad && modalidades.indexOf(modalidad) < 0) continue;
         var coincideSku = !!sku && (regla.skus || []).map(String).indexOf(sku) >= 0;
         var coincideNombre = !!nombre && (regla.nombres || []).map(function (n) { return String(n || '').trim().toUpperCase(); }).indexOf(nombre) >= 0;
-        if (!coincideSku && !coincideNombre) continue;
+        // La extensión CyberWeek alcanza a cualquier precio de Plan Canje
+        // habilitado. Las reglas específicas están antes y ganan, por lo que
+        // Iontrix 3 conserva el 25% y Senior4 su 10%, sin acumular descuentos.
+        var coincideCanjeGeneral = regla.todos_con_canje === true && modalidad === 'canje' && Number(p.plan_canje) > 0;
+        if (!coincideSku && !coincideNombre && !coincideCanjeGeneral) continue;
         var pct = Number(regla.porcentaje) || 0;
         if (pct <= 0 || pct >= 100) continue;
         return {
@@ -356,7 +368,7 @@
       if (!p || q <= 0) return;
       n += q;
       var beneficio = p.beneficio_producto || null;
-      // CyberMonday no se acumula con el descuento manual del presupuesto.
+      // Las promociones Cyber no se acumulan con el descuento manual del presupuesto.
       var pctDesc = beneficio ? 0 : getDesc(sku);
       var precioBase = Number(p.precio) || 0;
       var precioOriginal = beneficio ? Number(p.precio_original || precioBase) : precioBase;
@@ -1074,9 +1086,7 @@
         var soloCanje = modalidades.length === 1 && modalidades[0] === 'canje';
         return (soloCanje ? 'Plan Canje: ' : '') + esc(String(p.familia || '').replace(/^PSA\s+/i, '')) + ' ' + (Number(p.porcentaje) || 0) + '%';
       }).join(' · ');
-      var dDesde = String(campanaActiva.desde).split('-');
-      var dHasta = String(campanaActiva.hasta).split('-');
-      var vigCorta = Number(dDesde[2]) + ' al ' + Number(dHasta[2]) + '/' + Number(dHasta[1]);
+      var vigCorta = promoRango(campanaActiva);
       promoStrip = '<div class="lp-promo-strip">⚡ <b>' + esc(campanaActiva.nombre || 'Promoción') + ' · ' + esc(vigCorta) + '</b> · ' + promos + '<small>El descuento se aplica sólo a la modalidad indicada · No acumulable con otras promociones de producto</small></div>';
     }
     return '<div class="lp-wrap">' +
@@ -1442,13 +1452,24 @@
   function pagoSet(cuotas, banco) {
     try { localStorage.setItem(LS_PAGO, JSON.stringify({ cuotas: cuotas, banco: banco || '' })); } catch (e) {}
   }
+  function planVigente(banco) {
+    if (!banco) return false;
+    var hoy = fechaArgentinaISO();
+    return (!banco.desde || hoy >= banco.desde) && (!banco.hasta || hoy <= banco.hasta);
+  }
+  function bancosVigentes() {
+    return (PLANES.bancos || []).filter(planVigente);
+  }
   function pagoActual() {
     var g = pagoGet();
     var banco = g.banco || '';
-    var bancos = PLANES.bancos || [];
+    var bancos = bancosVigentes();
     var b = null;
     for (var i = 0; i < bancos.length; i++) if (bancos[i].id === banco) b = bancos[i];
-    if (!b) return { cuotas: 1, banco: null };
+    if (!b) {
+      if (banco) pagoSet(1, '');
+      return { cuotas: 1, banco: null };
+    }
     var c = Number(g.cuotas) || 1;
     if (b.cuotas && b.cuotas.indexOf(c) < 0) c = b.cuotas[b.cuotas.length - 1] || 1;
     return { cuotas: c, banco: b };
@@ -1528,13 +1549,20 @@
     var lab = $('lpCuotasLab'), wrapC = $('lpCuotasWrap'), info = $('lpPlanInfo');
     if (!hostB) return;
     var g = pagoGet();
-    var bancos = PLANES.bancos || [];
+    // La fecha de cada entidad manda: una opción todavía presente en el JSON
+    // deja de mostrarse automáticamente al terminar su vigencia.
+    var bancos = bancosVigentes();
     var bancoId = g.banco || '';
     var bAct = null;
     for (var i = 0; i < bancos.length; i++) if (bancos[i].id === bancoId) bAct = bancos[i];
     var cAct = Number(g.cuotas) || 1;
-    if (!bAct) cAct = 1;
-    else if (bAct.cuotas && bAct.cuotas.indexOf(cAct) < 0) {
+    if (!bAct) {
+      cAct = 1;
+      if (bancoId) {
+        pagoSet(1, '');
+        bancoId = '';
+      }
+    } else if (bAct.cuotas && bAct.cuotas.indexOf(cAct) < 0) {
       cAct = bAct.cuotas[bAct.cuotas.length - 1] || 1;
       pagoSet(cAct, bancoId);
     }
@@ -1576,7 +1604,7 @@
         if (!b) return;
         var id = b.getAttribute('data-banco') || '';
         if (!id) { pagoSet(1, ''); pintarPago(); pintarTotalPresupuesto(); pintarGanancia(); return; }
-        var lista = PLANES.bancos || [];
+        var lista = bancosVigentes();
         var ent = null;
         for (var i = 0; i < lista.length; i++) if (lista[i].id === id) ent = lista[i];
         var ops = (ent && ent.cuotas && ent.cuotas.length) ? ent.cuotas : (PLANES.cuotas || [3, 6, 9, 12]);
@@ -2321,7 +2349,8 @@
         var pFinal = ln.precioFinal || (Number(p.precio) || 0);
         var nomBase = sinMarca(p.nombre) || p.nombre || "";
         if (promoP > 0) {
-          nomBase += " *CYBERMONDAY " + promoP + "% OFF*";
+          var nombrePromo = (ln.beneficio && ln.beneficio.nombre) || 'PROMOCIÓN';
+          nomBase += " *" + String(nombrePromo).toUpperCase() + " " + promoP + "% OFF*";
         } else if (descP > 0) {
           nomBase += " *PROMO " + descP + "% DESCUENTO*";
         }
@@ -2519,8 +2548,19 @@
       pdf.setFontSize(7.5);
       pdf.setTextColor.apply(pdf, gris);
       var cond = 'Los precios de lista pueden variar según las promociones vigentes de cada tarjeta y el criterio de la empresa.';
-      var tienePromoProducto = r.lineas.some(function (ln) { return Number(ln.promoPct) > 0; });
-      if (tienePromoProducto) cond += '  CyberMonday válido del 1 al 4/11/2026. El descuento corresponde a la modalidad indicada (precio normal y/o Plan Canje) y no es acumulable con otras promociones de producto.';
+      var promosUsadas = {};
+      r.lineas.forEach(function (ln) {
+        var ben = ln.beneficio;
+        if (!ben || !(Number(ln.promoPct) > 0)) return;
+        var clave = ben.id || ben.nombre || 'promo';
+        promosUsadas[clave] = ben;
+      });
+      var nombresPromo = Object.keys(promosUsadas).map(function (clave) {
+        var ben = promosUsadas[clave];
+        var anio = String(ben.hasta || ben.desde || '').slice(0, 4);
+        return (ben.nombre || 'Promoción') + ' válida del ' + promoRango(ben) + (anio ? '/' + anio : '');
+      });
+      if (nombresPromo.length) cond += '  ' + nombresPromo.join('; ') + '. El descuento corresponde a la modalidad indicada (precio normal y/o Plan Canje) y no es acumulable con otras promociones de producto.';
       if (fecha) cond += '  ·  ' + fecha;
       pdf.text(pdf.splitTextToSize(cond, W - 2 * m), m, H - 17);
 

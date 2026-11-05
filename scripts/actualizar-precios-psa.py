@@ -548,6 +548,7 @@ def extraer_planes():
             "fuente": salida["fuente"],
             "fuente_legal": salida["fuente_legal"],
             "fuente_imagenes": salida["fuente_imagenes"],
+            "fuente_actualizacion": salida.get("fuente_actualizacion", ""),
             "cuotas": salida.get("cuotas", []),
             "bancos": salida.get("bancos", []),
         }
@@ -694,8 +695,8 @@ def fusionar_catalogo_anterior(productos, previo):
     return salida
 
 CYBER_2026 = {
-    "actualizado": "4-Nov-2026",
-    "fuente": "Lista de Precios Sugeridos PSA · Promo del 1 al 4 de noviembre de 2026",
+    "actualizado": "5-Nov-2026",
+    "fuente": "Piezas oficiales PSA · CyberMonday y extensión CyberWeek 2026",
     "campanas": [
         {
             "id": "cyber-monday-2026",
@@ -720,19 +721,37 @@ CYBER_2026 = {
                     "nombres": ["PSA OSMOSIS ROTECH BM UV", "PSA OSMOSIS ROTECH SM UV", "PSA AIRPURIFIER 220V"],
                 },
             ],
-        }
+        },
+        {
+            "id": "cyberweek-2026",
+            "nombre": "CyberWeek",
+            "desde": "2026-11-05",
+            "hasta": "2026-11-08",
+            "aplica": ["normal", "canje"],
+            "no_acumulable": True,
+            "financiacion": "Cuotas sin interés y reintegros según banco y tarjeta seleccionados; el reintegro se informa y no se descuenta del total.",
+            "productos": [
+                {"familia": "PSA Iontrix 3", "porcentaje": 25, "aplica": ["normal", "canje"], "skus": ["611290050"]},
+                {"familia": "PSA Senior4", "porcentaje": 10, "aplica": ["normal", "canje"], "skus": ["611010510", "611010530", "611010550", "611010560", "611010730"]},
+                {"familia": "resto de productos", "porcentaje": 10, "aplica": ["canje"], "todos_con_canje": True},
+            ],
+        },
     ],
 }
 
 
 def validar_cyber_2026(productos, now=None):
-    """Durante la campaña, la tienda debe confirmar los porcentajes oficiales.
+    """Durante cada campaña, la tienda debe confirmar los porcentajes oficiales.
     Si cambia una regla, no se publica un catálogo mezclado o con doble rebaja."""
     hoy = (now or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))).date().isoformat()
-    camp = CYBER_2026["campanas"][0]
-    if hoy < camp["desde"] or hoy > camp["hasta"]:
+    camp = next(
+        (c for c in CYBER_2026["campanas"] if c["desde"] <= hoy <= c["hasta"]),
+        None,
+    )
+    if not camp:
         return
     esperados = {}
+    obligatorios = set()
     for regla in camp["productos"]:
         modalidades = regla.get("aplica") or camp.get("aplica") or ["normal", "canje"]
         # GraphQL expone el precio normal de tienda, no el valor especial de
@@ -740,9 +759,13 @@ def validar_cyber_2026(productos, now=None):
         # oficial y no deben compararse con el precio final de la tienda.
         if "normal" not in modalidades:
             continue
-        for sku in regla.get("skus") or []:
+        skus = regla.get("skus") or []
+        for sku in skus:
             esperados[sku] = regla["porcentaje"]
-    obligatorios = {"611030420", "611290050", "611010510"}
+        # Al menos una referencia de cada familia con precio normal debe quedar
+        # confirmada por la tienda antes de publicar la actualización automática.
+        if skus:
+            obligatorios.add(skus[0])
     vistos = set()
     errores = []
     for p in productos:
@@ -761,7 +784,7 @@ def validar_cyber_2026(productos, now=None):
     if faltan:
         errores.append("sin confirmación de tienda: " + ", ".join(faltan))
     if errores:
-        raise RuntimeError("CyberMonday 2026 no pasó la auditoría: " + "; ".join(errores))
+        raise RuntimeError(f"{camp.get('nombre', 'Cyber 2026')} no pasó la auditoría: " + "; ".join(errores))
 
 
 def leer_prev(path):

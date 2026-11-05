@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-async function entrar(page) {
+async function entrar(page, fecha = '2026-11-09') {
   // Regresiones generales del diseño y descuentos manuales: catálogo base
-  // fuera de la ventana CyberMonday.
-  await page.addInitScript(() => { window.__APPI_FECHA_PROMO__ = '2026-11-05'; });
+  // fuera de las campañas, salvo los casos que piden una fecha explícita.
+  await page.addInitScript(dia => { window.__APPI_FECHA_PROMO__ = dia; }, fecha);
   await page.goto('/index.html');
   await page.evaluate(() => {
     localStorage.clear();
@@ -367,11 +367,13 @@ test('Iontrix respeta lista oficial y los botones centran su contenido', async (
 
 test('presupuesto renovado muestra total grande, fotos, tarjetas y permite deslizar para eliminar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await entrar(page);
+  // El Senior histórico no tiene promo en precio normal durante CyberWeek y
+  // permite seguir probando el descuento manual con todos los bancos vigentes.
+  await entrar(page, '2026-11-05');
   await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
   await page.waitForSelector('.lp-item', { timeout: 10000 });
   await continuarLista(page);
-  await page.fill('#lpSearch', '611010510');
+  await page.fill('#lpSearch', '611010580');
   await page.locator('#lpList .lp-price-choice').nth(1).click();
   await page.locator('#lpFab').click();
 
@@ -389,7 +391,7 @@ test('presupuesto renovado muestra total grande, fotos, tarjetas y permite desli
   expect(fondos.presupuestoImagen).toBe('none');
   const totalCard = sheet.locator('.lp-total-card');
   await expect(totalCard).toContainText('TOTAL DEL PRESUPUESTO');
-  await expect(totalCard).toContainText('$950.000');
+  await expect(totalCard).toContainText('$781.000');
   await expect.poll(() => totalCard.evaluate(el => getComputedStyle(el).backgroundImage)).toContain('rgb(8, 122, 91)');
 
   const lineBlock = sheet.locator('.lp-line-block').first();
@@ -417,7 +419,7 @@ test('presupuesto renovado muestra total grande, fotos, tarjetas y permite desli
       const cs = getComputedStyle(el);
       return { id, clase: el.className, a: cs.getPropertyValue('--pay-a').trim().toLowerCase(), b: cs.getPropertyValue('--pay-b').trim().toLowerCase(), sigla: el.textContent.trim(), nombre: option.querySelector('b').textContent.trim() };
     };
-    const idsOtros = ['banco-nacion', 'banco-provincia', 'macro', 'santander', 'hipotecario', 'cabal', 'american-express', 'tarjeta-data', 'tarjeta-patagonia-365', 'tarjeta-tuya', 'tarjeta-sol', 'banco-del-sol'];
+    const idsOtros = ['banco-nacion', 'banco-provincia', 'macro', 'santander', 'hipotecario', 'cabal', 'american-express'];
     return {
       simple: colores('cuota-simple'),
       naranja: colores('tarjeta-naranja'),

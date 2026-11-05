@@ -29,7 +29,8 @@ Esta definición conserva como modelo aprobado la presentación estrenada en APP
 - Cada edición oficial se identifica por su PDF y sus piezas de financiación.
 - Una tabla nueva sólo puede publicarse cuando todas las entidades tengan cuotas, vigencia y condiciones comprobadas.
 - Si PSA publica datos incompletos o contradictorios, APPI no inventa cuotas ni reemplaza la última tabla verificada.
-- Cuando vence una promoción, no debe seguir presentándose como vigente: debe ser reemplazada por la nueva edición o quedar marcada como “Financiación en revisión”.
+- La app compara `desde` y `hasta` contra la fecha argentina: antes del comienzo y después del vencimiento la entidad se oculta automáticamente, aunque el JSON aún conserve el registro para auditoría.
+- Una selección guardada que ya venció debe volver a contado; nunca puede conservar cuotas de una entidad fuera de vigencia.
 - Toda nueva publicación debe validar la pantalla de Presupuesto y la generación del PDF antes de llegar a los usuarios.
 
 ## Protección ante cambios de PSA
@@ -48,5 +49,7 @@ La política segura es:
 ## Referencia aprobada
 
 - Diseño y comportamiento base: APPI v891.
-- Fuente revisada: promociones PSA publicadas el 2 de noviembre de 2026.
+- Datos vigentes: piezas oficiales PSA CyberWeek recibidas el 5 de noviembre de 2026.
+- Credicoop/Cabal: 3, 6, 9, 12 y 18 cuotas del 5 al 11/11, sin reintegro.
+- Vencimiento automático por entidad: APPI v914.
 - La regla visual de esta página no debe eliminarse en futuras actualizaciones sin aprobación expresa del propietario de APPI.

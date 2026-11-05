@@ -220,8 +220,8 @@ test('el PDF de presupuesto informa modalidad, porcentaje y final de CyberMonday
   expect(textos).toContain('modalidad indicada');
 });
 
-test('fuera de la vigencia deja de aplicar la promoción y conserva los precios base', async ({ page }) => {
-  await abrirListaEn(page, '2026-11-05');
+test('fuera de las vigencias Cyber deja de aplicar la promoción y conserva los precios base', async ({ page }) => {
+  await abrirListaEn(page, '2026-11-09');
   const vero = await producto(page, '611030420');
   await expect(vero).not.toContainText('CyberMonday');
   await expect(vero.locator('.lp-price-choice').nth(0)).toContainText('$494.100');

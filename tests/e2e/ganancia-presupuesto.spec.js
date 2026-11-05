@@ -41,7 +41,7 @@ async function abrirSheetCon(page, cart, perfil) {
   // Estas pruebas verifican la tabla permanente de ganancia, no una campaña
   // temporal. Fijar el día posterior evita que un descuento vigente cambie
   // importes o visibilidad de una regresión que no trata sobre promociones.
-  await page.addInitScript(() => { window.__APPI_FECHA_PROMO__ = '2026-11-05'; });
+  await page.addInitScript(() => { window.__APPI_FECHA_PROMO__ = '2026-11-09'; });
   await initComun(cart, perfil)(page);
   await base.entrar(page);
   mockGan(page);

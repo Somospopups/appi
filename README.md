@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v914 · CyberWeek temporal y financiación con vencimiento automático
+
+- **CyberWeek del 5 al 8/11/2026:** PSA Iontrix 3 tiene 25% OFF en precio normal y Plan Canje; las cinco PSA Senior4 (Bianco, Nero, BM, Grigio y Terra) tienen 10% OFF en ambas modalidades.
+- Los demás productos con precio de **Plan Canje habilitado** reciben 10% OFF sólo sobre ese precio. Las reglas específicas ganan, por lo que los descuentos no se acumulan.
+- La promoción anterior de **Vero 45%** queda cerrada el 4/11 y no se extiende. Los precios base permanecen intactos y todo vuelve automáticamente a lista el 9/11.
+- Financiación actualizada con las once entidades de las piezas aprobadas. **Credicoop/Cabal** ofrece 3, 6, 9, 12 y 18 cuotas del 5 al 11/11, sin 15 cuotas ni reintegro.
+- La Lista y el presupuesto ocultan automáticamente una entidad antes de su comienzo o después de su vencimiento. Pantalla y PDF repiten descuento, cuotas, canal y vigencia; los reintegros se informan sin descontarlos del total.
+- Versión: **v914 · Segura** → Cache `appi-v914-cyberweek`.
+
 ## v913 · Jornada garantizada de 10 tareas útiles
 
 - La jornada diaria ahora tiene **exactamente 10 tareas útiles**: primero usa clientes realmente elegibles y completa los lugares libres con acciones comerciales concretas.
