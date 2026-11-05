@@ -468,6 +468,10 @@
     scheduleRefresh(3400,false);
     window.addEventListener('storage',function(event){if(event.key&&(/^(appi_acciones_v1_|appi_reactivacion_v1_|appi_gestion_|agenda_personal_|appi_progreso_v1_)/.test(event.key))){reactivationCache=null;scheduleRefresh(500,false)}});
     window.addEventListener('appi-datasync-applied',function(){lastKey='';store=null;reactivationCache=null;scheduleRefresh(900,false)});
+    // El Panel carga su copia local después del login rápido. Recalcular cuando
+    // esa evidencia queda lista evita que la tarjeta permanezca en el estado
+    // provisional aunque los contactos ya estén disponibles.
+    window.addEventListener('appi-gestion-actualizada',function(){scheduleRefresh(320,true)});
     document.addEventListener('visibilitychange',function(){if(!document.hidden)scheduleRefresh(700,false)});
     window.addEventListener('online',function(){scheduleRefresh(1200,false)});
   }

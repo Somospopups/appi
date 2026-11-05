@@ -265,7 +265,12 @@ test('las tarjetas son inteligentes: solo aparecen las categorías con novedades
   expect(cats).toContain('panel');         // Carla está nueva sin contactar
   expect(cats).not.toContain('oportunidades'); // v805: el bonus no vive en ninguna tarjeta
   expect(cats).not.toContain('cumples');   // nadie cumple años en los datos
-  expect(cats).not.toContain('usuarios');  // sin planilla de garantías cargada
+  // v913: aunque no haya planilla de garantías, Usuarios completa la jornada
+  // con acciones comerciales reales tomadas de los contactos del fixture.
+  const resumenUsuarios = await page.evaluate(() => window.APPIMensajes.resumenHoy());
+  expect(resumenUsuarios.clientes).toBe(0);
+  expect(resumenUsuarios.comerciales).toBeGreaterThan(0);
+  expect(cats).toContain('usuarios');
 });
 
 test('el mazo queda a la vista: sin botón 🔔, sin ✕ de cierre, sin ✗ y sin Pasar (v318)', async ({ page }) => {

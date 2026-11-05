@@ -56,6 +56,14 @@ test('Mi avance aparece debajo del calendario y abre la experiencia completa con
   });
   expect(order.progressTop).toBeGreaterThanOrEqual(order.monthBottom-1);
   await expect(page.locator('#appiProgresoHomeCard')).toContainText('4 de 4 áreas');
+  const mobileLayout=await page.evaluate(()=>{
+    const rect=selector=>document.querySelector(selector).getBoundingClientRect();
+    const card=rect('#appiProgresoHomeCard'),orb=rect('.apg-home-orb'),next=rect('.apg-next-mini');
+    return {orbTop:orb.top,orbBottom:orb.bottom,orbLeft:orb.left,cardTop:card.top,nextTop:next.top,nextLeft:next.left};
+  });
+  expect(mobileLayout.orbTop-mobileLayout.cardTop).toBeLessThan(45);
+  expect(mobileLayout.orbBottom).toBeLessThanOrEqual(mobileLayout.nextTop-4);
+  expect(Math.abs(mobileLayout.orbLeft-mobileLayout.nextLeft)).toBeLessThanOrEqual(1);
   await page.locator('#appiProgresoHomeCard').click();
   await expect(page.locator('#view-progreso')).toHaveClass(/active/);
   await expect(page.locator('.apg-areas')).toContainText('Orden');

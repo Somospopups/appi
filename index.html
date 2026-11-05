@@ -136,6 +136,7 @@ window.openStock=function(){
      la app, para que el gesto de atrás cierre el panel abierto y no navegue. -->
 <script src="./panel-atras.js?v=618"></script>
 <script src="./auth-config.js"></script>
+<script src="./appi-vendors.js?v=918"></script>
 <script src="./appi-dialog.js?v=618"></script>
 <script src="./appi-popup-effects.js?v=865"></script>
 <script src="./appi-notif.js?v=894"></script>
@@ -143,17 +144,17 @@ window.openStock=function(){
 <script src="./appi-onboarding.js?v=898"></script>
 <script src="./telefono.js?v=639"></script>
 <script src="./whatsapp-app.js?v=618"></script>
-<script src="./auth-client.js?v=898"></script>
+<script src="./auth-client.js?v=918"></script>
 <script src="./prueba-banner.js?v=618"></script>
-<script src="./data-sync.js?v=915"></script>
+<script src="./data-sync.js?v=918"></script>
 <script src="./js/membership-admin.js?v=618"></script>
-<script src="./admin-panel.js?v=618"></script>
+<script src="./admin-panel.js?v=918"></script>
 <script src="./js/compromiso-pago.js?v=618"></script>
 <link rel="stylesheet" href="./css/membership-admin.css?v=618">
 <link rel="stylesheet" href="./appi-tema.css?v=618">
 <script src="./account-request.js?v=618"></script>
 <script src="./qr-code.js?v=618"></script>
-<script src="./gestion-client.js?v=618"></script>
+<script src="./gestion-client.js?v=918"></script>
   <script src="./agenda-personal.js?v=618"></script>
 <script src="./margarita-contactos.js?v=638"></script>
 <script src="./tarjetas-promos.js?v=618"></script>
@@ -161,17 +162,15 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=914"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=917"></script>
+  <script src="./campus-psa.js?v=918"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=917"></script>
-<script src="./vendor/pdf.min.js?v=618"></script>
+<script src="./lista-precios.js?v=918"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
-<script src="./vendor/zxing.min.js?v=618"></script>
-<script src="./stock-personal.js?v=618"></script>
+<script src="./stock-personal.js?v=918"></script>
 
 <script src="./porque-vivo.js?v=618"></script>
 <script src="./home-limpio.js?v=618"></script>
@@ -675,11 +674,7 @@ body.dark .hs-ranking-entry,body.dark .hs-ranking-card{background:#fffdf8!import
 .hs-ranking-tabs button{position:relative;overflow:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.hs-ranking-tabs button.holding:after{content:"";position:absolute;left:8px;right:8px;bottom:4px;height:4px;border-radius:999px;background:currentColor;transform-origin:left center;animation:hs890Hold .55s linear forwards}.hs-ranking-share-hint{margin:0 4px 9px;padding:10px 11px;border-radius:13px;background:#e9f5f0;color:#315e51;font-size:12px;line-height:1.42;font-weight:750}.hs-ranking-share-hint b{color:#0b5878}.hs-ranking-description{margin-top:0!important}@keyframes hs890Hold{from{transform:scaleX(0);opacity:.45}to{transform:scaleX(1);opacity:1}}body.dark .hs-ranking-share-hint{background:#e9f5f0!important;color:#315e51!important}@media(prefers-reduced-motion:reduce){.hs-ranking-tabs button.holding:after{animation:none;transform:scaleX(1)}}
 </style>
 
-<script src="./vendor/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw"></script>
-<script src="./vendor/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H"></script>
-<script src="./vendor/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"></script>
-<script src="./vendor/svg2pdf.umd.min.js" integrity="sha384-HoxAKaOOcVifYbcey45SDVl9ja1q3b04qwykef9f6tzQAkkmNNGH3lclNdTquUX9"></script>
-<script src="./vendor/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG"></script>
+<!-- v918: Excel, captura, PDF y ZIP se cargan desde appi-vendors.js sólo al usar la herramienta. -->
 <script type="importmap">
 {
   "imports": {
@@ -4667,15 +4662,15 @@ html body .lp-fab{
 
 <!-- No bloquear el primer dibujo de Android por una hoja externa: el estilo
      principal ya está inline y estos módulos se aplican apenas llegan. -->
-<link rel="stylesheet" href="./appi-gotita.css?v=917" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="./appi-progreso.css?v=917" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="./appi-assistant.css?v=917" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="./appi-tour.css?v=917" media="print" onload="this.media='all'">
-<script src="./appi-gotita.js?v=917" defer></script>
-<script src="./appi-progreso.js?v=917" defer></script>
-<script src="./appi-assistant.js?v=917" defer></script>
-<script src="./appi-buscar.js?v=917" defer></script>
-<script src="./appi-tour.js?v=917" defer></script>
+<link rel="stylesheet" href="./appi-gotita.css?v=918" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-progreso.css?v=918" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-assistant.css?v=918" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-tour.css?v=918" media="print" onload="this.media='all'">
+<script src="./appi-gotita.js?v=918" defer></script>
+<script src="./appi-progreso.js?v=918" defer></script>
+<script src="./appi-assistant.js?v=918" defer></script>
+<script src="./appi-buscar.js?v=918" defer></script>
+<script src="./appi-tour.js?v=918" defer></script>
 </head>
 <body>
 
@@ -4708,7 +4703,7 @@ html body .lp-fab{
   if(!boot)return;
   const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   window.__appiBootStartedAt=performance.now();
-  window.__appiBootMinimumMs=1800;
+  window.__appiBootMinimumMs=700;
   window.__appiBootReadyHoldMs=250;
   window.__appiBootExitTimer=0;
   boot.dataset.phase='loading';
@@ -4717,12 +4712,12 @@ html body .lp-fab{
 </script>
 <style>
 #bootScreen[data-exit-requested="1"],#bootScreen.leaving,#bootScreen.gone{pointer-events:none!important}
-#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;isolation:isolate;opacity:1;background:linear-gradient(180deg,#06172d 0%,#0a2946 44%,#12526b 100%);transition:opacity .52s ease,visibility 0s linear 0s}
+#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;isolation:isolate;opacity:1;background:linear-gradient(180deg,#06172d 0%,#0a2946 44%,#12526b 100%);transition:opacity .28s ease,visibility 0s linear 0s}
 #bootScreen.gone{pointer-events:none;display:none!important}
 .boot-ambience{position:absolute;inset:0;z-index:0;overflow:hidden;background:radial-gradient(circle at 18% 18%,rgba(66,157,196,.16),transparent 34%),radial-gradient(circle at 83% 35%,rgba(81,212,202,.11),transparent 32%),radial-gradient(circle at 50% 82%,rgba(22,148,167,.18),transparent 43%)}
 .boot-orb{position:absolute;border-radius:50%;filter:blur(28px);opacity:.2;animation:bootOrb 5.8s ease-in-out infinite alternate}.boot-orb.orb-one{width:170px;height:170px;left:-90px;top:21%;background:#4ecddd}.boot-orb.orb-two{width:190px;height:190px;right:-105px;bottom:12%;background:#2485c4;animation-delay:-2.4s}
 @keyframes bootOrb{to{transform:translate3d(13px,-9px,0) scale(1.08);opacity:.26}}
-.boot-water{position:absolute;z-index:2;inset:-1px 0 0;transform:translate3d(0,105%,0);will-change:transform;background:linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);box-shadow:0 -18px 48px rgba(93,228,229,.2);transition:transform 1.55s cubic-bezier(.18,.76,.22,1)}
+.boot-water{position:absolute;z-index:2;inset:-1px 0 0;transform:translate3d(0,105%,0);will-change:transform;background:linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);box-shadow:0 -18px 48px rgba(93,228,229,.2);transition:transform .62s cubic-bezier(.18,.76,.22,1)}
 .boot-water::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 24%,rgba(0,22,42,.14));pointer-events:none}
 #bootScreen.fill .boot-water{transform:translate3d(0,11%,0)}
 .boot-wave{position:absolute;z-index:3;left:-12%;width:124%;height:52px;top:-28px;will-change:transform}.boot-wave svg{display:block;width:100%;height:100%}.boot-wave.wave-back{opacity:.48;animation:bootWaveBack 5.8s ease-in-out infinite alternate}.boot-wave.wave-back path{fill:rgba(157,245,240,.62)}.boot-wave.wave-front{top:-19px;opacity:.88;animation:bootWaveFront 4.4s ease-in-out infinite alternate}.boot-wave.wave-front path{fill:rgba(218,255,251,.83)}
@@ -4741,12 +4736,12 @@ html body .lp-fab{
 .boot-footer{position:absolute;z-index:6;left:0;right:0;bottom:36px;text-align:center;color:rgba(220,247,248,.5);font-size:9px;font-weight:750;letter-spacing:1.5px;text-transform:uppercase}
 #bootScreen.ready .boot-dots{width:0;margin-left:0;opacity:0;transform:translateY(4px);overflow:hidden}#bootScreen.ready .boot-ready-mark{opacity:1;transform:scale(1) rotate(0)}#bootScreen.ready .boot-glass{border-color:rgba(180,255,232,.82);box-shadow:0 25px 58px rgba(0,22,43,.36),0 0 28px rgba(112,243,195,.1),inset 0 1px 0 rgba(255,255,255,.72)}#bootScreen.ready .boot-water{transform:translate3d(0,9%,0);transition-duration:.28s}
 @keyframes bootBrandIn{from{opacity:0;transform:translate(-50%,calc(-50% + 14px)) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}@keyframes bootFloat{50%{transform:translateY(-6px)}}@keyframes bootDot{0%,70%,100%{transform:translateY(0);opacity:.35}35%{transform:translateY(-4px);opacity:1}}
-#bootScreen.leaving{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .52s ease,visibility 0s linear .52s}#bootScreen.leaving .boot-water{transform:translate3d(0,7%,0);transition-duration:.52s}#bootScreen.leaving .boot-brand{animation:none;transform:translate(-50%,calc(-50% - 5px)) scale(1.025);opacity:0;transition:transform .52s cubic-bezier(.2,.8,.2,1),opacity .32s ease}
+#bootScreen.leaving{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s ease,visibility 0s linear .28s}#bootScreen.leaving .boot-water{transform:translate3d(0,7%,0);transition-duration:.28s}#bootScreen.leaving .boot-brand{animation:none;transform:translate(-50%,calc(-50% - 5px)) scale(1.025);opacity:0;transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .2s ease}
 #bootScreen.solo-agua{background:transparent!important;z-index:10180!important;opacity:1!important;visibility:visible!important;pointer-events:auto}
 #bootScreen.solo-agua .boot-brand,#bootScreen.solo-agua .boot-footer,#bootScreen.solo-agua .boot-ambience{display:none!important}
 #bootScreen.solo-agua.fill .boot-water{transform:translate3d(0,0,0)}
 #bootScreen.solo-agua.leaving{opacity:1!important;visibility:visible!important;background:transparent!important;pointer-events:none!important;transition:none!important}
-#bootScreen.solo-agua.leaving .boot-water{transform:translate3d(0,105%,0);transition:transform 1.55s cubic-bezier(.45,.06,.18,1)}
+#bootScreen.solo-agua.leaving .boot-water{transform:translate3d(0,105%,0);transition:transform .62s cubic-bezier(.45,.06,.18,1)}
 #bootScreen.solo-agua.leaving .boot-brand{display:none!important;opacity:0!important}
 @media(prefers-reduced-motion:reduce){#bootScreen.solo-agua .boot-water,#bootScreen.solo-agua.leaving .boot-water{transition-duration:.01ms!important}}
 
@@ -4789,7 +4784,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v917 · Segura</div>
+  <div class="ds-foot">APPI · v918 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7636,7 +7631,7 @@ function subirAguaAPPI(){
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){
         b.classList.add('fill');
-        setTimeout(done,1750);
+        setTimeout(done,700);
       });
     });
   });
@@ -7653,7 +7648,7 @@ function bajarAguaAPPI(){
   setTimeout(function(){
     try{b.classList.add('gone');b.remove();if(typeof window.__appiSyncBrowserTheme==='function')window.__appiSyncBrowserTheme()}catch(e){}
     if(typeof liberarScrollCuerpo==='function')liberarScrollCuerpo();
-  },1600);
+  },680);
 }
 function revelarAppLista(){
   window.__appiCubriendoInicio=false;
@@ -8823,6 +8818,9 @@ function catBadgeStyle(info){
   return `background:${info.color};color:${textColor};${border}`;
 }
 let equipoData = null;
+let equipoStorageRaw = null;
+let equipoHydrationQueued = false;
+let equipoHydratedOnce = false;
 let equipoActiveTab = 'dashboard';
 let equipoTreeMode = 'lista';
 let equipoFilterCat = 'all';
@@ -8833,21 +8831,68 @@ let equipoTopMode = 'personal'; // 'personal' o 'organizacion'
 function loadEquipoFromStorage(){
   try {
     const raw = localStorage.getItem('equipoData');
-    if(!raw) return false;
+    if(!raw){equipoData=null;equipoStorageRaw=null;return false}
+    if(equipoData&&raw===equipoStorageRaw)return true;
     const parsed=JSON.parse(raw);
     try { validarTitularContraCuenta(parsed.titular||{}); }
     catch (error) { console.warn('Planilla titular', error && error.message); }
     equipoData=parsed;
+    equipoStorageRaw=raw;
     return true;
   } catch(error){
     console.warn('Planilla local', error);
     return false;
   }
 }
-window.addEventListener('appi-datasync-applied',()=>{try{loadEquipoFromStorage()}catch(e){}});
+function hidratarEquipoTrasPrimerDibujo(force){
+  if(equipoHydrationQueued&&!force)return;
+  equipoHydrationQueued=true;
+  window.__appiEquipoHydrationPending=true;
+  let esperaHome=0;
+  const run=()=>{
+    // showView activa la vista antes de que home-limpio termine de insertar su
+    // nodo. Esperar ese primer dibujo real; dos frames solos no lo garantizan
+    // cuando el teléfono o la suite están cargados.
+    if(!document.getElementById('homeLimpio')&&esperaHome<80){
+      esperaHome++;
+      setTimeout(run,50);
+      return;
+    }
+    equipoHydrationQueued=false;
+    try{
+      if(force)equipoStorageRaw=null;
+      loadEquipoFromStorage();
+      equipoHydratedOnce=true;
+    }catch(error){console.warn('Hidratación de planilla',error)}
+    window.__appiEquipoHydrationPending=false;
+    // Home ya está dibujado y puede estar recibiendo un toque, un swipe o una
+    // tarea de calendario. No reconstruirlo al terminar de parsear la planilla:
+    // las demás vistas se actualizan ahora o al abrirse, sin reemplazar nodos
+    // bajo el dedo de la persona.
+    try{
+      const active=document.querySelector('.view.active');
+      if(active&&active.id!=='view-home')renderHomeCompleto();
+    }catch(e){console.warn('Actualizar datos de planilla',e)}
+    try{window.dispatchEvent(new CustomEvent('appi-equipo-hidratado',{detail:{ready:!!equipoData}}))}catch(e){}
+    try{if(window.APPIProgreso)window.APPIProgreso.programar(700,true)}catch(e){}
+  };
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(typeof requestIdleCallback==='function')requestIdleCallback(run,{timeout:450});
+    else setTimeout(run,0);
+  }));
+}
+window.hidratarEquipoTrasPrimerDibujo=hidratarEquipoTrasPrimerDibujo;
+window.addEventListener('appi-datasync-applied',()=>{
+  // La sincronización también mueve agenda, progreso y otras claves. La
+  // planilla grande sólo vuelve a analizarse si su contenido realmente cambió.
+  let raw=null;
+  try{raw=localStorage.getItem('equipoData')}catch(e){}
+  if(raw!==equipoStorageRaw)hidratarEquipoTrasPrimerDibujo(true);
+});
 function saveEquipoToStorage(){
   try {
-    localStorage.setItem('equipoData', JSON.stringify(equipoData));
+    equipoStorageRaw=JSON.stringify(equipoData);
+    localStorage.setItem('equipoData', equipoStorageRaw);
     localStorage.setItem('lastUpdate_equipo', Date.now().toString());
     try { window.dispatchEvent(new CustomEvent('appi-equipo-cambio', { detail: equipoData })); } catch(e){}
   } catch(e){ modal.open({ icon:'⚠️', title:'Error al guardar', html:'<p>El archivo puede ser muy grande. Probá con menos personas.</p>' }); }
@@ -9442,7 +9487,7 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
   const file = e.target.files[0]; if(!file) return;
   showToast('Procesando…', 3000);
   const reader = new FileReader();
-  reader.onload = (evt)=>{
+  reader.onload = async (evt)=>{
     try {
       const buffer = evt.target.result;
       const uint8 = new Uint8Array(buffer);
@@ -9488,6 +9533,7 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
         });
         console.log('📊 Filas TOTALES extraídas del HTML:', rows.length);
       } else {
+        await window.APPIVendors.ensure('xlsx');
         const wb = XLSX.read(uint8, { type: 'array', cellDates: false });
         const ws = wb.Sheets[wb.SheetNames[0]];
         rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: true });
@@ -9575,7 +9621,7 @@ document.getElementById('garantiasFileInput').onchange = (e)=>{
   if(!file) return;
   showToast('Procesando garantías…', 3000);
   const reader = new FileReader();
-  reader.onload = (evt)=>{
+  reader.onload = async (evt)=>{
     try {
       const buffer = evt.target.result;
       const uint8 = new Uint8Array(buffer);
@@ -9606,6 +9652,7 @@ document.getElementById('garantiasFileInput').onchange = (e)=>{
           }
         });
       } else {
+        await window.APPIVendors.ensure('xlsx');
         const wb = XLSX.read(uint8, { type: 'array', cellDates: false });
         rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: true });
       }
@@ -11514,6 +11561,7 @@ function generarHtmlHoja(ramas, numeroHoja, totalHojas, nombreTitular){
 
 // Genera una imagen de una hoja específica
 async function generarImagenHoja(htmlHoja){
+  await window.APPIVendors.ensure('html2canvas');
   // Crear contenedor temporal
   let renderEl = document.getElementById('exportRender');
   if(renderEl) renderEl.remove();
@@ -11563,6 +11611,7 @@ async function generarImagenHoja(htmlHoja){
 
 // Genera un ZIP con todas las hojas
 async function generarZipRamas(personaRaiz, nombreTitular){
+  await window.APPIVendors.ensure('jszip');
   // Si la persona raíz no tiene hijos, es una hoja sola
   const ramas = (personaRaiz.hijos && personaRaiz.hijos.length > 0) 
     ? personaRaiz.hijos 
@@ -11770,6 +11819,7 @@ function generarGuiaEnsamblaje(canvasOriginal, filas, columnas){
 
 // Genera el PDF final con todas las páginas
 async function generarPdfPoster(canvasOriginal, filas, columnas, nombreArchivo){
+  await window.APPIVendors.ensure('jspdf');
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({
     orientation: 'landscape',
@@ -12047,6 +12097,7 @@ function descargarArchivo(blob, fileName){
   setTimeout(() => URL.revokeObjectURL(url), 100);
 }
  async function generarImagenArbol(personaRaiz){
+  await window.APPIVendors.ensure('html2canvas');
   const desc = contarDescendientes(personaRaiz);
   const totalPers = desc + 1;
   
@@ -12253,7 +12304,7 @@ function obtenerProgresoSieteActual(){
   return { done:0, total: SIETE_P.length, pct:0, existe:false };
 }
 function obtenerDatosEquipo(){
-  if(!equipoData) loadEquipoFromStorage();
+  if(!equipoData&&!window.__appiEquipoHydrationPending) loadEquipoFromStorage();
   if(!equipoData || !equipoData.personas) return { existe: false };
   const total = equipoData.personas.length;
   const activos = equipoData.personas.filter(p => (p.pnAct||0) > 0).length;
@@ -12345,7 +12396,7 @@ function bonusEsc(s){
   return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function personasOportunidadBonus(){
-  if(!equipoData) loadEquipoFromStorage();
+  if(!equipoData&&!window.__appiEquipoHydrationPending) loadEquipoFromStorage();
   if(!equipoData||!equipoData.personas) return [];
   const hidden=new Set(bonusNotifDismissed());
   const near=[], ready=[];
@@ -13649,6 +13700,9 @@ async function asegurarPersonaActiva(){
 }
 async function completarIngresoDistribuidor(){
   await asegurarPersonaActiva();
+  // Cambiar de titular/socio o de cuenta restaura primero SU copia local. No
+  // hay red en este paso y se evita mostrar por un instante datos ajenos.
+  try{if(window.APPIDataSync&&window.APPIDataSync.resumeLocal)await window.APPIDataSync.resumeLocal({claimLegacy:true})}catch(error){console.error('Copia local de cuenta',error)}
   // La sync de la cuenta no puede bloquear el ingreso: si falla (red, 404,
   // qué sea) la persona ya eligió y la app abre igual — funciona en modo
   // offline con la copia local y la sync se reintenta desde la cuenta.
@@ -13662,9 +13716,11 @@ async function completarIngresoDistribuidor(){
   // una sola vez, al arrancar). La app abre con la copia local y se actualiza
   // sola cuando la sync termina (evento appi-datasync-applied).
   if(window.APPIDataSync){
-    window.APPIDataSync.start({claimLegacy:true}).then(function(sync){
-      if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
-    }).catch(function(error){ console.error('Sincronización inicial', error); });
+    despuesDelPrimerDibujo(function(){
+      window.APPIDataSync.start({claimLegacy:true}).then(function(sync){
+        if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
+      }).catch(function(error){ console.error('Sincronización inicial', error); });
+    });
   }
 }
 function mostrarCambioPasswordObligatorio(){
@@ -13772,7 +13828,7 @@ function ocultarBoot(force){
       b.setAttribute('aria-busy','false');
       b.classList.add('leaving');
       window.__appiBootRemovedAt=performance.now();
-      setTimeout(()=>{try{b.classList.add('gone');b.remove();if(typeof window.__appiSyncBrowserTheme==='function')window.__appiSyncBrowserTheme()}catch(e){}},560);
+      setTimeout(()=>{try{b.classList.add('gone');b.remove();if(typeof window.__appiSyncBrowserTheme==='function')window.__appiSyncBrowserTheme()}catch(e){}},300);
     },hold);
   },wait);
 }
@@ -13805,15 +13861,23 @@ function iniciarApp() {
     setTimeout(()=>{if(window.APPIAdminPanel)window.APPIAdminPanel.open()},0);
   }else{
     document.body.classList.remove('appi-admin');
-    loadEquipoFromStorage();
+    // La planilla puede tener miles de personas. Primero pintamos Home con la
+    // información liviana y recién después del primer frame la analizamos.
+    // Una revalidación remota puede volver a entrar en iniciarApp(): si la
+    // misma planilla ya está hidratada no se programa el trabajo otra vez.
+    let _equipoRawActual=null;
+    try{_equipoRawActual=localStorage.getItem('equipoData')}catch(e){}
+    const _equipoNecesitaHidratacion=!equipoHydratedOnce||_equipoRawActual!==equipoStorageRaw;
+    if(_equipoNecesitaHidratacion)window.__appiEquipoHydrationPending=true;
     
     // Mostrar home directamente — salvo que la persona ya navegó a otra
     // pantalla: el arranque se demora (elección de persona + sync) y forzar
     // Home a los 2-3s les sacaba a quienes abrieron el Panel justo a tiempo.
     const _curView=document.querySelector('.view.active');
     if(!_curView||_curView.id==='view-home')showView('view-home');
+    if(_equipoNecesitaHidratacion)hidratarEquipoTrasPrimerDibujo(false);
     
-    if(window.initHistoricoAPPI)setTimeout(()=>window.initHistoricoAPPI(),0);
+    if(window.initHistoricoAPPI)requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(()=>window.initHistoricoAPPI(),0)));
     if(typeof mostrarTutorialSiNuevo==='function')setTimeout(mostrarTutorialSiNuevo,700);
     setTimeout(avisarMembresiaUsuario,1000);
   }
@@ -13822,6 +13886,15 @@ function iniciarApp() {
   const descubrir=function(){
     revelarAppLista();
     forzarScrollLibre();
+    // Cuando el Home ya está estable, completar de a poco la copia offline de
+    // Excel/PDF/escaneo. Nunca se descargan durante el primer dibujo.
+    if(!window.__appiOptionalWarmScheduled&&'serviceWorker' in navigator){
+      window.__appiOptionalWarmScheduled=true;
+      setTimeout(()=>navigator.serviceWorker.ready.then(reg=>{
+        const worker=reg.active||navigator.serviceWorker.controller;
+        if(worker)worker.postMessage({type:'APPI_WARM_OPTIONAL'});
+      }).catch(()=>{}),12000);
+    }
   };
   if(typeof requestAnimationFrame==='function')requestAnimationFrame(function(){requestAnimationFrame(descubrir)});
   else setTimeout(descubrir,32);
@@ -14382,26 +14455,72 @@ function abrirBackupDesdeMenu(){
 }
 
 
-// Verificar acceso al arrancar
+function despuesDelPrimerDibujo(tarea){
+  const lanzar=()=>setTimeout(()=>{try{tarea()}catch(error){console.error('Tarea posterior al inicio',error)}},40);
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(()=>requestAnimationFrame(lanzar));
+  else setTimeout(lanzar,60);
+}
+function motivoAccesoRemoto(result){
+  const saved=window.APPIAuth&&window.APPIAuth.load?window.APPIAuth.load():null;
+  if(result&&result.reason==='account_disabled')return 'account_disabled';
+  return saved&&window.APPIAuth&&!window.APPIAuth.offlineEligible(saved)?'offline_expired':(result&&result.reason)||'auth_error';
+}
+async function revalidarYSincronizarCuenta(claimLegacy=true){
+  const result=await window.APPIAuth.authorize();
+  if(!result.ok){
+    marcarInicioCubierto(false);
+    mostrarPantallaLoginDistribuidor(motivoAccesoRemoto(result));
+    return false;
+  }
+  const profile=window.APPIAuth.currentProfile();
+  if(profile&&profile.rol!=='admin'&&profile.debe_cambiar_password){mostrarCambioPasswordObligatorio();return false}
+  try{
+    if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:claimLegacy});
+  }catch(error){console.error('Sincronización inicial',error)}
+  if(result.offline)setTimeout(()=>showToast('Modo offline · conectate antes de 7 días',3200),300);
+  return true;
+}
+
+// Verificar acceso al arrancar. Una sesión validada en los últimos 7 días abre
+// primero desde el teléfono; la cuenta y la nube se revalidan después del
+// primer dibujo. Un bloqueo o vencimiento remoto vuelve a cerrar la app.
 (async function() {
-  if(window.APPIAuth&&window.APPIAuth.isEnabled()){
-    const result=await window.APPIAuth.authorize();
-    if(result.ok){
-      const profile=window.APPIAuth.currentProfile();
-      if(profile&&profile.rol!=='admin'&&profile.debe_cambiar_password){mostrarCambioPasswordObligatorio();return}
-      try{if(profile&&profile.rol!=='admin')await asegurarPersonaActiva();marcarInicioCubierto(true);if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:!(profile&&profile.rol==='admin')})}catch(error){console.error('Preparar datos de cuenta',error)}
-      localStorage.removeItem('appi_activada');
-      iniciarApp();
-      if(result.offline)setTimeout(()=>showToast('Modo offline · conectate antes de 7 días',3200),500);
-    }else{
-      const saved=window.APPIAuth.load();
-      const reason=result.reason==='account_disabled'?'account_disabled':(saved&&!window.APPIAuth.offlineEligible(saved)?'offline_expired':result.reason);
-      mostrarPantallaLoginDistribuidor(reason);
-    }
+  if(!(window.APPIAuth&&window.APPIAuth.isEnabled())){
+    mostrarPantallaLoginDistribuidor('not_configured');
     return;
   }
-  // Sin una configuración de autenticación válida, APPI permanece cerrada.
-  mostrarPantallaLoginDistribuidor('not_configured');
+  const local=window.APPIAuth.load();
+  const localProfile=local&&local.profile;
+  if(localProfile&&localProfile.rol!=='admin'&&window.APPIAuth.isLocallyAuthorized()){
+    if(localProfile.debe_cambiar_password){mostrarCambioPasswordObligatorio();return}
+    try{
+      await asegurarPersonaActiva();
+      marcarInicioCubierto(true);
+      if(window.APPIDataSync&&window.APPIDataSync.resumeLocal)await window.APPIDataSync.resumeLocal({claimLegacy:true});
+    }catch(error){console.error('Reanudación local',error)}
+    localStorage.removeItem('appi_activada');
+    iniciarApp();
+    despuesDelPrimerDibujo(()=>revalidarYSincronizarCuenta(true));
+    return;
+  }
+
+  // Sin una validación local vigente sí hace falta consultar la cuenta antes
+  // de mostrar datos. Aun en ese caso la sincronización completa queda fuera
+  // de la ruta crítica.
+  const result=await window.APPIAuth.authorize();
+  if(!result.ok){mostrarPantallaLoginDistribuidor(motivoAccesoRemoto(result));return}
+  const profile=window.APPIAuth.currentProfile();
+  if(profile&&profile.rol!=='admin'&&profile.debe_cambiar_password){mostrarCambioPasswordObligatorio();return}
+  try{
+    if(profile&&profile.rol!=='admin'){
+      await asegurarPersonaActiva();
+      marcarInicioCubierto(true);
+      if(window.APPIDataSync&&window.APPIDataSync.resumeLocal)await window.APPIDataSync.resumeLocal({claimLegacy:true});
+    }
+  }catch(error){console.error('Preparar copia local',error)}
+  localStorage.removeItem('appi_activada');
+  iniciarApp();
+  if(profile&&profile.rol!=='admin')despuesDelPrimerDibujo(()=>window.APPIDataSync&&window.APPIDataSync.start({claimLegacy:true}).catch(error=>console.error('Sincronización inicial',error)));
 })();
 </script>
 <script>
@@ -14524,8 +14643,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='917';
-    const CACHE_NAME='appi-v917-inicio-movil';
+    const swVersion='918';
+    const CACHE_NAME='appi-v918-inicio-inmediato';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -15683,6 +15802,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     const lk=loading('Generando PDF vectorial…');
     let holder=null;
     try{
+      await window.APPIVendors.ensure(['jspdf','svg2pdf']);
       const svgText=buildExportSVG();
       holder=document.createElement('div');
       holder.style.cssText='position:fixed;left:-99999px;top:0;opacity:0;pointer-events:none';
@@ -18252,16 +18372,12 @@ function abrirPanelDepurados(){
     b.onclick=function(){ depuradosDeshacer(b.getAttribute('data-depurado-undo')); };
   });
 }
-function cargarArchivoU(file){
+async function cargarArchivoU(file){
   const infoEl=document.getElementById('usuariosFileInfo');
   const dbgEl=document.getElementById('usuariosDebug');
   try{
     if(infoEl){ infoEl.style.display='block'; infoEl.innerHTML=`⏳ Leyendo <b>${escU(file.name)}</b> (${(file.size/1024).toFixed(1)} KB) ...<br/><small>Si no avanza, revisá consola (F12)</small>`; }
-    if(typeof XLSX==='undefined'){
-      window.APPIDialog.alert('La librería para leer Excel todavía no terminó de cargar. Cerrá y volvé a abrir APPI e intentá de nuevo.',{title:'Librería Excel no cargada',icon:'⚠️'});
-      if(infoEl) infoEl.innerHTML=`❌ La librería para leer Excel no cargó. Cerrá y volvé a abrir APPI.`;
-      return;
-    }
+    await window.APPIVendors.ensure('xlsx');
     console.log('📂 Archivo seleccionado:', file.size, file.type);
     const reader=new FileReader();
     reader.onerror=(e)=>{ 
@@ -18943,7 +19059,6 @@ async function sha256(file){
   try{const hash=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('')}catch(e){return ''}
 }
 async function readSheets(file){
-  if(typeof XLSX==='undefined')throw new Error('La librería Excel no está disponible. Abrí APPI con conexión y recargá.');
   const buffer=await file.arrayBuffer(),uint8=new Uint8Array(buffer);
   const first=new TextDecoder('utf-8').decode(uint8.slice(0,700)).toLowerCase();
   const isHtml=first.includes('<html')||first.includes('<!doctype')||first.includes('<table');
@@ -18956,6 +19071,7 @@ async function readSheets(file){
     }));
     return [{name:'HTML',rows}];
   }
+  await window.APPIVendors.ensure('xlsx');
   const wb=XLSX.read(uint8,{type:'array',cellDates:false,raw:true});
   return wb.SheetNames.map(name=>({name,rows:XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:'',raw:true,blankrows:false})}));
 }
@@ -19659,7 +19775,7 @@ function renderCOPA(latest,previous){
   const {people,active,activity,productivity,branches,categories,growthText,growthSub}=copaMetrics(latest,previous);
   return `<section class="hist-card hist-copa"><div class="hist-card-head"><div><div class="hist-copa-kicker">LECTURA COPA</div><h3>Cuatro miradas del mismo cierre</h3><p>Crecimiento · Organización · Productividad · Actividad</p></div><span class="hist-badge">${esc(latest.label)}</span></div><div class="hist-copa-grid"><button class="hist-copa-item c" data-hist-drill="pb"><span class="hist-copa-letter">C</span><div><small>CRECIMIENTO</small><b>${growthText}</b><p>${growthSub}</p></div><em>Ver PB ›</em></button><button class="hist-copa-item o" data-hist-drill="pb"><span class="hist-copa-letter">O</span><div><small>ORGANIZACIÓN</small><b>${people} personas</b><p>${branches} ramas · ${categories} categorías</p></div><em>Ver organización ›</em></button><button class="hist-copa-item p" data-hist-drill="active"><span class="hist-copa-letter">P</span><div><small>PRODUCTIVIDAD</small><b>${fmt(productivity)} PB</b><p>Promedio por persona activa</p></div><em>Ver activas ›</em></button><button class="hist-copa-item a" data-hist-drill="active"><span class="hist-copa-letter">A</span><div><small>ACTIVIDAD</small><b>${activity}%</b><p>${active} activas de ${people}</p></div><em>Ver actividad ›</em></button></div><div class="hist-copa-note">COPA ordena los datos que ya surgen de los archivos. No agrega estimaciones ni modifica los cierres.</div></section>`;
 }
-async function createAnnualPdf(year,action='share'){const jsPDF=window.jspdf&&window.jspdf.jsPDF;if(!jsPDF){toast('No se pudo cargar el generador de PDF. Revisá tu conexión.',3500);return null}const matrix=annualMatrix(year);if(!matrix.periods.length){toast('No hay cierres para generar el PDF.',2600);return null}const pdf=new jsPDF({orientation:'landscape',unit:'pt',format:'a4',compress:true}),pageW=pdf.internal.pageSize.getWidth(),pageH=pdf.internal.pageSize.getHeight(),margin=25,tableW=pageW-margin*2,indicatorW=166,dataW=(tableW-indicatorW)/13,last=matrix.periods[matrix.periods.length-1],titular=last.titular||{},fileName=`APPI-Resumen-Anual-${year}.pdf`;
+async function createAnnualPdf(year,action='share'){try{await window.APPIVendors.ensure('jspdf')}catch(e){toast('No se pudo cargar el generador de PDF. Revisá tu conexión.',3500);return null}const jsPDF=window.jspdf&&window.jspdf.jsPDF;if(!jsPDF){toast('No se pudo cargar el generador de PDF. Revisá tu conexión.',3500);return null}const matrix=annualMatrix(year);if(!matrix.periods.length){toast('No hay cierres para generar el PDF.',2600);return null}const pdf=new jsPDF({orientation:'landscape',unit:'pt',format:'a4',compress:true}),pageW=pdf.internal.pageSize.getWidth(),pageH=pdf.internal.pageSize.getHeight(),margin=25,tableW=pageW-margin*2,indicatorW=166,dataW=(tableW-indicatorW)/13,last=matrix.periods[matrix.periods.length-1],titular=last.titular||{},fileName=`APPI-Resumen-Anual-${year}.pdf`;
   pdf.setFillColor(52,62,105);pdf.roundedRect(margin,22,tableW,52,8,8,'F');pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(18);pdf.text('APPI',margin+15,45);pdf.setFontSize(12);pdf.text(`Resumen anual ${year}`,margin+15,63);pdf.setFont('helvetica','normal');pdf.setFontSize(8);const owner=[titular.nombre,titular.dip&&`DIP ${titular.dip}`].filter(Boolean).join(' · ');pdf.text(owner||'Histórico anual',pageW-margin-15,45,{align:'right'});pdf.text(`${matrix.periods.length} de 12 cierres cargados`,pageW-margin-15,61,{align:'right'});
   let y=85;const headerH=23;pdf.setFillColor(224,229,244);pdf.rect(margin,y,tableW,headerH,'F');pdf.setDrawColor(191,198,218);pdf.setLineWidth(.45);pdf.setTextColor(52,57,76);pdf.setFont('helvetica','bold');pdf.setFontSize(7.3);pdf.text('INDICADOR',margin+7,y+15);[...SHORT_H,'TOTAL'].forEach((label,i)=>pdf.text(label,margin+indicatorW+dataW*i+dataW/2,y+15,{align:'center'}));pdf.rect(margin,y,tableW,headerH);for(let i=0;i<=13;i++){const x=margin+indicatorW+dataW*i;pdf.line(x,y,x,y+headerH)}y+=headerH;
   const sections=matrix.rows.filter(r=>r.section).length,dataRows=matrix.rows.length-sections,available=pageH-y-49,scale=Math.min(1,available/(sections*16+dataRows*20)),sectionH=16*scale,rowH=20*scale;let stripe=0;
@@ -19667,6 +19783,7 @@ async function createAnnualPdf(year,action='share'){const jsPDF=window.jspdf&&wi
   const stamp=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});pdf.setTextColor(99,103,120);pdf.setFont('helvetica','normal');pdf.setFontSize(6.7);pdf.text('El total organizacional se distribuye por categoría usando PB personales; cada persona se cuenta una sola vez.',margin,pageH-26);pdf.text(`Generado por APPI · ${stamp}`,pageW-margin,pageH-26,{align:'right'});const blob=pdf.output('blob'),file=new File([blob],fileName,{type:'application/pdf'}),result={blob,fileName,year,months:matrix.periods.length,size:blob.size,createdAt:new Date().toISOString()};if(action==='blob')return result;if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:`Resumen anual APPI ${year}`,text:`Resumen anual ${year} generado por APPI`});toast('PDF compartido',2200);return result}catch(error){if(error&&error.name==='AbortError'){toast('Se canceló el envío del PDF.',2200);return result}}}pdf.save(fileName);toast('PDF horizontal descargado. Ya podés compartirlo.',3200);return result}
 async function shareAnnualPdf(year){return createAnnualPdf(year,'share')}
 async function shareFullHistoricalReport(year){
+  try{await window.APPIVendors.ensure('jspdf')}catch(e){toast('No se pudo cargar el generador de PDF. Revisá tu conexión.',3500);return}
   const jsPDF=window.jspdf&&window.jspdf.jsPDF,periods=H.periods.filter(p=>p.year===year).sort((a,b)=>a.id.localeCompare(b.id));if(!jsPDF){toast('No se pudo cargar el generador de PDF. Revisá tu conexión.',3500);return}if(!periods.length){toast('No hay cierres para generar el informe.',2600);return}
   const pdf=new jsPDF({orientation:'landscape',unit:'pt',format:'a4',compress:true}),W=pdf.internal.pageSize.getWidth(),PH=pdf.internal.pageSize.getHeight(),M=28,latest=periods[periods.length-1],first=periods[0],owner=latest.titular||{},matrix=annualMatrix(year),strategies=buildStrategies(periods),fileName=`APPI-Informe-Completo-${year}.pdf`;
   const C={navy:[49,57,96],blue:[91,141,239],purple:[160,107,255],green:[58,208,164],red:[217,83,90],amber:[233,154,32],ink:[45,47,64],muted:[112,114,132],line:[216,220,234],soft:[246,247,252],lav:[239,236,253],white:[255,255,255]};
@@ -20259,7 +20376,7 @@ async function createOnlineReport(periods,strategies,a){
 }
 
 async function makeBackupZip(periods,fileName){
-  if(typeof JSZip==='undefined')throw new Error('El generador ZIP no está disponible.');const zip=new JSZip(),ids=new Set(periods.map(p=>p.id)),files=[],archives=[];
+  await window.APPIVendors.ensure('jszip');const zip=new JSZip(),ids=new Set(periods.map(p=>p.id)),files=[],archives=[];
   for(const p of periods){const stored=await dbGetAll('files','periodId',p.id);for(const f of stored){const path=`archivos/${p.id}/${f.type}-${safeFileName(f.name)}`;zip.file(path,f.blob);files.push({path,key:f.key,periodId:f.periodId,type:f.type,name:f.name,size:f.size,mime:f.mime,lastModified:f.lastModified})}}
   if(periods===H.periods)for(const archive of H.archives){const path=`archivados/${archive.fileName||`APPI-Resumen-Anual-${archive.year}.pdf`}`,{blob,...meta}=archive;if(blob)zip.file(path,blob);archives.push({...cloneClean(meta),path})}
   const reports=H.reports.filter(r=>(r.periodIds||[]).some(id=>ids.has(id)));zip.file('historico.json',JSON.stringify({format:'APPI-HISTORICO',schema:2,exportedAt:new Date().toISOString(),periods:cloneClean(periods),reports:cloneClean(reports),files,archives},null,2));
@@ -20271,7 +20388,7 @@ async function exportAllZip(){
 async function exportPeriodZip(id){const p=H.periods.find(x=>x.id===id);if(!p)return;try{await makeBackupZip([p],`APPI_cierre_${id}.zip`);toast('ZIP del mes descargado')}catch(e){toast(e.message,3000)}}
 async function restoreBackup(file){
   if(!file)return;toast('Revisando backup…',1800);
-  try{const zip=await JSZip.loadAsync(file),entry=zip.file('historico.json');if(!entry)throw new Error('El ZIP no contiene historico.json');const data=JSON.parse(await entry.async('string'));if(data.format!=='APPI-HISTORICO'||!Array.isArray(data.periods))throw new Error('El backup no pertenece al Histórico de APPI.');if(!await window.APPIDialog.confirm(`Se restaurarán ${data.periods.length} cierres. Los meses coincidentes serán reemplazados.`,{title:'Restaurar backup',icon:'📦',okText:'Restaurar'}))return;
+  try{await window.APPIVendors.ensure('jszip');const zip=await JSZip.loadAsync(file),entry=zip.file('historico.json');if(!entry)throw new Error('El ZIP no contiene historico.json');const data=JSON.parse(await entry.async('string'));if(data.format!=='APPI-HISTORICO'||!Array.isArray(data.periods))throw new Error('El backup no pertenece al Histórico de APPI.');if(!await window.APPIDialog.confirm(`Se restaurarán ${data.periods.length} cierres. Los meses coincidentes serán reemplazados.`,{title:'Restaurar backup',icon:'📦',okText:'Restaurar'}))return;
     const db=await openDB();for(const p of data.periods)await dbPut('periods',p);for(const r of data.reports||[])await dbPut('reports',r);for(const meta of data.files||[]){const zf=zip.file(meta.path);if(!zf)continue;const blob=await zf.async('blob');await dbPut('files',{...meta,blob})}for(const meta of data.archives||[]){const zf=zip.file(meta.path),blob=zf?await zf.async('blob'):null;const {path,...archive}=meta;await dbPut('archives',{...archive,blob})}await refreshData();render();toast(`${data.periods.length} cierres y ${(data.archives||[]).length} archivos anuales restaurados`,2600);if(navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),350)
   }catch(e){console.error('Restaurar histórico',e);toast(`No se pudo restaurar: ${e.message}`,3500)}finally{$('histRestoreInput').value=''}
 }
@@ -21774,13 +21891,15 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
     })();
   }catch(e){}
 
-  setTimeout(()=>{
+  function instalarEmbudoKpi(){
     try{
       const view=document.getElementById("view-negocio");
       if(!view) return;
       if(document.getElementById("embudoKpi")) return;
       let personas=0, activos=0, pbEquipo=0;
-      try{ const r=JSON.parse(localStorage.getItem("equipoData")||"null"); if(r&&r.personas){ personas=r.personas.length; r.personas.forEach(p=>{ const v=Number(p.pnAct||p.pbPersonal||0); pbEquipo+=v; if(v>0) activos++; }); } }catch(e){}
+      // La planilla ya fue hidratada fuera del primer dibujo. No volver a
+      // parsear miles de filas desde un temporizador de arranque.
+      try{ const r=(typeof equipoData!=='undefined')?equipoData:null; if(r&&r.personas){ personas=r.personas.length; r.personas.forEach(p=>{ const v=Number(p.pnAct||p.pbPersonal||0); pbEquipo+=v; if(v>0) activos++; }); } }catch(e){}
       if(!personas) return;
       const pct=personas?Math.round(activos/personas*100):0;
       const pb=(embudoKpiLiderPB()!=null)?embudoKpiLiderPB():pbEquipo;
@@ -21805,7 +21924,9 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       if(grid) view.insertBefore(bar, grid);
       else view.appendChild(bar);
     }catch(e){}
-  },900);
+  }
+  window.addEventListener('appi-equipo-hidratado',instalarEmbudoKpi);
+  setTimeout(instalarEmbudoKpi,1200);
 
 })();
 </script>
@@ -22105,6 +22226,15 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
       const activa=document.querySelector('.view.active');
       const id=activa && activa.id;
       if(esVistaDatosPSA(id)) pedirPopupPSA(true);
+    }catch(e){}
+  }, 4000);
+})();
+</script>
+
+<
+</body>
+</html>
+)) pedirPopupPSA(true);
     }catch(e){}
   }, 4000);
 })();

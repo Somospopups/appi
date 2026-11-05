@@ -1,5 +1,12 @@
 # APPI
 
+## v918 · Inicio inmediato
+
+- Reanudación local segura: Home primero; validación y nube en segundo plano.
+- Planillas grandes y bibliotecas de Excel/PDF/escaneo salen de la ruta crítica.
+- OCR se carga solamente al abrir la cámara de Mi stock.
+- Versión: **v918 · Segura** → Cache `appi-v918-inicio-inmediato`.
+
 PWA local-first para planificación mensual, presupuesto, equipo, garantías, contactos, notas, grabadora, Histórico, encuestas y gestión de referidos.
 
 > **Agentes:** al retomar el trabajo, leer [`AGENTE.md`](AGENTE.md) y preguntar si el propietario está trabajando desde Arena.ai. Si confirma que sí, seguir [`PUBLICAR_CAMBIOS.md`](PUBLICAR_CAMBIOS.md) y entregar al final un ZIP con `PUBLICAR.bat` y un Git bundle.

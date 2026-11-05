@@ -1000,6 +1000,7 @@ function descargarBlobCump(blob,name){
 async function capturarCumpImagen(){
   const el=$('adminCumpFicha');
   if(!el) throw new Error('No está el calendario.');
+  if(window.APPIVendors)await window.APPIVendors.ensure('html2canvas');
   const h2c=window.html2canvas;
   if(typeof h2c!=='function') throw new Error('No se pudo armar la imagen.');
   const canvas=await h2c(el,{backgroundColor:'#f4f4f8',scale:2,logging:false,useCORS:true});

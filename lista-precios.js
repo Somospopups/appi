@@ -2188,6 +2188,10 @@
     var r = resumen();
     if (!r.n) return;
     var JsPDF = window.jspdf && window.jspdf.jsPDF;
+    if (!JsPDF && window.APPIVendors) {
+      window.APPIVendors.ensure('jspdf').then(armarPdf, function(){ aviso('No se pudo cargar el PDF.'); });
+      return;
+    }
     if (!JsPDF) { aviso('No se pudo cargar el PDF.'); return; }
     var pedir = (window.APPIDialog && window.APPIDialog.prompt)
       ? window.APPIDialog.prompt('¿A quién va dirigido el presupuesto?', '', { title: 'Presupuesto', placeholder: 'Nombre (opcional)', okText: 'Continuar', cancelText: 'Volver', icon: '✎' })

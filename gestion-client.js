@@ -47,13 +47,16 @@ function cacheKey(){return `appi_gestion_cache_v1_${userId()}`}
    filas de otras cuentas (pasaba con la sesión admin), acá no entran. */
 function soloMios(rows){const uid=userId();return (Array.isArray(rows)?rows:[]).filter(row=>row&&(!row.user_id||row.user_id===uid))}
 function queueKey(){return `appi_gestion_queue_v1_${userId()}`}
+function notifyManagementUpdated(){
+  try{window.dispatchEvent(new CustomEvent('appi-gestion-actualizada',{detail:{contacts:state.contacts.length,lastLoaded:state.lastLoaded}}))}catch(e){}
+}
 function loadCache(){
-  try{const value=JSON.parse(localStorage.getItem(cacheKey())||'null');if(value&&Array.isArray(value.contacts)){state.contacts=soloMios(value.contacts);state.surveys=new Map(soloMios(value.surveys||[]).map(row=>[row.id,row]));state.activities=new Map();for(const row of soloMios(value.activities||[])){const list=state.activities.get(row.contacto_id)||[];list.push(row);state.activities.set(row.contacto_id,list)}state.lastLoaded=Number(value.savedAt)||0;loadBulkQueue();return true}}catch(e){}
+  try{const value=JSON.parse(localStorage.getItem(cacheKey())||'null');if(value&&Array.isArray(value.contacts)){state.contacts=soloMios(value.contacts);state.surveys=new Map(soloMios(value.surveys||[]).map(row=>[row.id,row]));state.activities=new Map();for(const row of soloMios(value.activities||[])){const list=state.activities.get(row.contacto_id)||[];list.push(row);state.activities.set(row.contacto_id,list)}state.lastLoaded=Number(value.savedAt)||0;loadBulkQueue();notifyManagementUpdated();return true}}catch(e){}
   return false;
 }
 function saveCache(){
   if(!userId())return;
-  try{localStorage.setItem(cacheKey(),JSON.stringify({contacts:state.contacts,surveys:[...state.surveys.values()],activities:[...state.activities.values()].flat(),savedAt:Date.now()}))}catch(e){}
+  try{localStorage.setItem(cacheKey(),JSON.stringify({contacts:state.contacts,surveys:[...state.surveys.values()],activities:[...state.activities.values()].flat(),savedAt:Date.now()}));notifyManagementUpdated()}catch(e){}
 }
 function loadQueue(){try{const q=JSON.parse(localStorage.getItem(queueKey())||'[]');return Array.isArray(q)?q:[]}catch(e){return []}}
 function saveQueue(queue){try{localStorage.setItem(queueKey(),JSON.stringify(queue))}catch(e){}}

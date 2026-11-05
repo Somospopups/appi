@@ -313,7 +313,7 @@
      (Tesseract, offline). SOLO se lee lo que está DENTRO del cuadro
      (v740): el texto se recorta exacto al campo y el QR se lee con
      margen de silencio (18%) — lo que quede afuera, bloqueado.
-     Velocidad: el motor OCR se calienta al abrir Mi Stock, el OCR
+     Velocidad: el motor OCR se carga recién al abrir la cámara, el OCR
      agranda el recorte (~1000 px) en grises con contraste, la
      confirmación sale a los ~0,9 s de una lectura buena y, cuando
      hay nombre + color + serie, la unidad se carga al toque. El
@@ -326,9 +326,8 @@
   // v761: lector ultra-rápido con BarcodeDetector nativo (Chrome/Edge) + fallback ZXing
   var barcodeDetector = null;
   try{ if('BarcodeDetector' in window){ barcodeDetector = new window.BarcodeDetector({formats:['qr_code']}); } }catch(e){}
-  // Pre-calentar OCR y catálogo al cargar la página (no al abrir la cámara)
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ cargarMotorOCR().catch(function(){}); cargarCatalogo().catch(function(){}); });
-  else { setTimeout(function(){ cargarMotorOCR().catch(function(){}); cargarCatalogo().catch(function(){}); }, 800); }
+  // v918: nada de OCR ni catálogo compite con el Home. Ambos se piden desde
+  // Mi stock y la cámara únicamente cuando la persona realmente los usa.
   function cargarMotorOCR(){
     if (ocrPromise) return ocrPromise;
     ocrPromise = new Promise(function(resolve, reject){
@@ -707,6 +706,11 @@
     css();
     overlayEscan();
     prepararAudio();
+    // ZXing (329 KB) es sólo el respaldo para teléfonos sin BarcodeDetector.
+    // Se carga al abrir la cámara, nunca durante el arranque de APPI.
+    if(!barcodeDetector&&!window.ZXing&&window.APPIVendors){
+      window.APPIVendors.ensure('zxing').catch(function(){ /* la cámara y OCR siguen disponibles */ });
+    }
     escan.abierto = true;
     // Modo: el que le pasa el botón que lo abrió (en escritorio conviven
     // las dos cámaras); si no, el del tab activo. stock = etiqueta
@@ -2451,20 +2455,21 @@
     css();
     crearVista();
     tab = 'stock';
+    // Mi stock sigue abriendo al instante. Sólo en equipos sin lector QR nativo
+    // se prepara ZXing después de entrar; el OCR de 8 MB espera a la cámara.
+    var qrReady=Promise.resolve(true);
+    if(!barcodeDetector&&!window.ZXing&&window.APPIVendors)qrReady=window.APPIVendors.ensure('zxing').catch(function(){return false});
     if (typeof showView === 'function') showView('view-stock');
     var tabs = $('tabs');
     if (tabs) tabs.style.display = 'none';
     pintar();
-    // Calienta el lector de texto (solo si aún no arrancó): cuando el
-    // usuario toque 📷 ya viene listo y la primera lectura sale al
-    // instante. La descarga (~8 MB) solo ocurre la primera vez.
-    if (!ocrPromise) {
-      cargarMotorOCR().catch(function(){ /* sin internet: se reintenta al abrir el escáner */ });
-    }
+    // v918: abrir Mi stock no descarga OCR. El motor pesado se inicia recién
+    // cuando se toca la cámara; la carga manual y los préstamos siguen livianos.
     // v741: carga la referencia del catálogo oficial (63 productos) para
     // que el escáner "lea de memoria" los nombres. Es un JSON chico y
     // queda en caché; si no hay internet se usa el archivo local de la app.
     cargarCatalogo().then(datalistCatalogo, function(){});
+    return qrReady;
   }
 
   window.openStock = abrir;

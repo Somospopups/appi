@@ -24,7 +24,7 @@ const PREFIXES=[
   // con los números que arregló a mano.
   'appi_telf_editados_v1_'
 ];
-const state={ready:false,userId:'',workspaceId:'',personType:'titular',values:{},changedAt:{},dirty:new Set(),deleted:new Set(),dropCloudKeys:new Set(),cacheTimer:null,syncTimer:null,syncing:false,lastError:''};
+const state={ready:false,userId:'',workspaceId:'',personType:'titular',values:{},changedAt:{},dirty:new Set(),deleted:new Set(),dropCloudKeys:new Set(),cacheTimer:null,syncTimer:null,syncing:false,syncPromise:null,lastError:''};
 const nativeSet=Storage.prototype.setItem;
 const nativeRemove=Storage.prototype.removeItem;
 
@@ -165,6 +165,10 @@ function collect(){
   return values;
 }
 function hasMeaningfulData(values){return Object.keys(values||{}).some(key=>!['themeDark','home_sec_mes','home_sec_neg'].includes(key))}
+function sameValues(left,right){
+  const a=Object.keys(left||{}),b=Object.keys(right||{});if(a.length!==b.length)return false;
+  return a.every(key=>Object.prototype.hasOwnProperty.call(right||{},key)&&String(left[key])===String(right[key]));
+}
 function openDB(){
   return new Promise((resolve,reject)=>{
     const request=indexedDB.open(DB_NAME,1);
@@ -318,6 +322,40 @@ async function pullLatest(){
   try{window.dispatchEvent(new CustomEvent('appi-datasync-applied'))}catch(e){}
   return true;
 }
+// Restaura únicamente la copia de este dispositivo. No hace red y, cuando el
+// mismo espacio ya está activo, tampoco toca localStorage: el Home puede salir
+// en el primer dibujo sin esperar IndexedDB ni Supabase.
+async function resumeLocal({claimLegacy=true}={}){
+  if(!window.APPIAuth||!window.APPIAuth.isEnabled()||!window.APPIAuth.isLocallyAuthorized())return {ready:false};
+  const userId=window.APPIAuth.userId();if(!userId)throw new Error('La cuenta no tiene un identificador válido.');
+  const personType=activePersonType(),workspaceId=`${userId}:${personType}`;
+  const previousWorkspace=localStorage.getItem(ACTIVE_USER_KEY)||'';
+  const sameWorkspace=previousWorkspace===workspaceId||(personType==='titular'&&previousWorkspace===userId);
+  const working=collect(),workingAudio=localStorage.getItem(AUDIO_META_KEY);
+
+  state.userId=userId;state.workspaceId=workspaceId;state.personType=personType;state.lastError='';state.dropCloudKeys=new Set();state.deleted=new Set();
+
+  if(sameWorkspace){
+    state.values={...working};state.changedAt={};state.dirty=new Set();state.ready=true;
+    nativeSet.call(localStorage,ACTIVE_USER_KEY,workspaceId);
+    return {ready:true,local:true,sameWorkspace:true,keys:Object.keys(working).length,personType};
+  }
+
+  if(workingAudio!=null&&previousWorkspace)nativeSet.call(localStorage,audioMetaKey(previousWorkspace),workingAudio);
+  let cache=await cacheGet(workspaceId).catch(()=>null);
+  if(!cache&&personType==='titular')cache=await cacheGet(userId).catch(()=>null);
+  let values=cache&&cache.values||{},changedAt=cache&&cache.changedAt||{};
+  if(!previousWorkspace&&claimLegacy&&personType==='titular'&&hasMeaningfulData(working)&&!hasMeaningfulData(values)){
+    const now=Date.now();values=working;changedAt={};Object.keys(working).forEach(key=>changedAt[key]=now);
+  }
+  state.values={...values};state.changedAt={...changedAt};state.dirty=new Set();
+  applyValues(state.values);
+  nativeRemove.call(localStorage,AUDIO_META_KEY);
+  const userAudio=localStorage.getItem(audioMetaKey(workspaceId));if(userAudio!=null)nativeSet.call(localStorage,AUDIO_META_KEY,userAudio);
+  nativeSet.call(localStorage,ACTIVE_USER_KEY,workspaceId);state.ready=true;
+  return {ready:true,local:true,sameWorkspace:false,keys:Object.keys(state.values).length,personType};
+}
+
 async function start({claimLegacy=true}={}){
   if(!window.APPIAuth||!window.APPIAuth.isEnabled()||!window.APPIAuth.isLocallyAuthorized())return {ready:false};
   const userId=window.APPIAuth.userId();if(!userId)throw new Error('La cuenta no tiene un identificador válido.');
@@ -347,28 +385,41 @@ async function start({claimLegacy=true}={}){
   // ganando por la regla de conflictos.
   try{
     const fresh=collect();
-    for(const key of Object.keys(state.values)){
-      const ahora=fresh[key];
-      if(ahora===undefined||ahora===working[key])continue;
-      const remoto=remote.values?remote.values[key]:undefined;
-      if(remoto!==undefined&&String(remoto)!==String(ahora))continue;
-      state.values[key]=ahora;
-      state.dirty.add(key);
+    // Incluye claves creadas o borradas mientras la red estaba respondiendo.
+    // En v918 el Home ya está utilizable durante ese lapso: una acción real
+    // de la persona siempre gana y se sube luego, nunca se borra al aplicar.
+    const liveKeys=new Set([...Object.keys(state.values),...Object.keys(working),...Object.keys(fresh)]);
+    for(const key of liveKeys){
+      const antes=working[key],ahora=fresh[key];
+      if(ahora===antes)continue;
+      if(ahora===undefined){
+        delete state.values[key];state.dirty.delete(key);state.deleted.add(key);
+      }else{
+        state.values[key]=ahora;state.deleted.delete(key);state.dirty.add(key);
+        state.changedAt[key]=Date.now();
+      }
     }
   }catch(e){}
   rememberLegacyAcciones(remote.dropCloudKeys,personType);
-  applyValues(state.values);
+  // Si el pull no cambió nada, no volver a aplicar ni anunciar: Home ya está
+  // activo y un render redundante reemplazaría calendario/mazo en plena interacción.
+  const valuesChanged=!sameValues(state.values,collect());
+  if(valuesChanged)applyValues(state.values);
   nativeRemove.call(localStorage,AUDIO_META_KEY);
   const userAudio=localStorage.getItem(audioMetaKey(workspaceId));if(userAudio!=null)nativeSet.call(localStorage,AUDIO_META_KEY,userAudio);
   nativeSet.call(localStorage,ACTIVE_USER_KEY,workspaceId);state.ready=true;
   await cachePut(cacheRecord()).catch(()=>{});
-  try{window.dispatchEvent(new CustomEvent('appi-datasync-applied'))}catch(e){}
+  if(valuesChanged){try{window.dispatchEvent(new CustomEvent('appi-datasync-applied'))}catch(e){}}
   if(online&&(state.dirty.size||state.deleted.size))await syncNow(false);
   else if(online&&state.dropCloudKeys.size)await dropLegacyAcciones();
   return {ready:true,online,claimedLegacy:preferLocal,keys:Object.keys(state.values).length,personType};
 }
 async function syncNow(force=false){
-  if(!state.ready||state.syncing||!navigator.onLine)return false;
+  if(!state.ready||!navigator.onLine)return false;
+  if(state.syncing){
+    try{await state.syncPromise}catch(error){if(!force)throw error}
+    return force?syncNow(true):true;
+  }
   const userId=state.userId||window.APPIAuth.userId();if(!userId)return false;
   const keys=[...state.dirty].filter(key=>{
     if(isProtectedPlanillaKey(key)&&!planillaValueAlive(state.values[key])){state.dirty.delete(key);return false}
@@ -387,19 +438,22 @@ async function syncNow(force=false){
     return true;
   }
   state.syncing=true;
-  try{
-    if(keys.length){
-      const now=new Date().toISOString();
-      const rows=keys.filter(key=>Object.prototype.hasOwnProperty.call(state.values,key)).map(key=>({user_id:userId,data_key:cloudDataKey(key),data:{value:state.values[key]},updated_at:now}));
-      if(rows.length)await cloudFetch('/rest/v1/appi_datos?on_conflict=user_id,data_key',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});
-    }
-    for(const key of deleted)await cloudFetch(`/rest/v1/appi_datos?user_id=eq.${encodeURIComponent(userId)}&data_key=eq.${encodeURIComponent(cloudDataKey(key))}` ,{method:'DELETE'});
-    keys.forEach(key=>state.dirty.delete(key));deleted.forEach(key=>state.deleted.delete(key));state.lastError='';
-    if(force)await pullLatest();else await cachePut(cacheRecord()).catch(()=>{});
-    if(state.dropCloudKeys.size)await dropLegacyAcciones();
-    return true;
-  }catch(error){state.lastError=error.message;throw error}
-  finally{state.syncing=false}
+  state.syncPromise=(async()=>{
+    try{
+      if(keys.length){
+        const now=new Date().toISOString();
+        const rows=keys.filter(key=>Object.prototype.hasOwnProperty.call(state.values,key)).map(key=>({user_id:userId,data_key:cloudDataKey(key),data:{value:state.values[key]},updated_at:now}));
+        if(rows.length)await cloudFetch('/rest/v1/appi_datos?on_conflict=user_id,data_key',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});
+      }
+      for(const key of deleted)await cloudFetch(`/rest/v1/appi_datos?user_id=eq.${encodeURIComponent(userId)}&data_key=eq.${encodeURIComponent(cloudDataKey(key))}` ,{method:'DELETE'});
+      keys.forEach(key=>state.dirty.delete(key));deleted.forEach(key=>state.deleted.delete(key));state.lastError='';
+      if(force)await pullLatest();else await cachePut(cacheRecord()).catch(()=>{});
+      if(state.dropCloudKeys.size)await dropLegacyAcciones();
+      return true;
+    }catch(error){state.lastError=error.message;throw error}
+    finally{state.syncing=false;state.syncPromise=null}
+  })();
+  return state.syncPromise;
 }
 async function logoutAndLock({removeCache=false}={}){
   let synced=true;
@@ -423,5 +477,5 @@ document.addEventListener('visibilitychange',()=>{
 window.addEventListener('pagehide',()=>{if(state.ready)syncNow(false).catch(()=>{})});
 setInterval(()=>{if(state.ready&&navigator.onLine&&(state.dirty.size||state.deleted.size||state.dropCloudKeys.size))syncNow(false).catch(()=>{})},30000);
 
-window.APPIDataSync={isDataKey,isSharedKey,isAccionesKey,isProgresoKey,cloudDataKey,localDataKey,mergeAccionesValue,mergeProgresoValue,collect,start,syncNow,logoutAndLock,status,cacheDelete};
+window.APPIDataSync={isDataKey,isSharedKey,isAccionesKey,isProgresoKey,cloudDataKey,localDataKey,mergeAccionesValue,mergeProgresoValue,collect,resumeLocal,start,syncNow,logoutAndLock,status,cacheDelete};
 })();

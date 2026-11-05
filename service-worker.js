@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v917-inicio-movil';
+const CACHE_NAME = 'appi-v918-inicio-inmediato';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -12,6 +12,7 @@ const APP_SHELL = [
   './formulario-equipo.html',
   './revisar-contactos.html',
   './auth-config.js',
+  './appi-vendors.js',
   './appi-dialog.js',
   './appi-popup-effects.js',
   './appi-notif.js',
@@ -47,18 +48,13 @@ const APP_SHELL = [
   './mensajes-usuarios.js',
   './campus-preguntas.js',
   './campus-psa.js',
-  './vendor/hls.min.js',
   './reactivacion.js',
   './escalera-suenos.js',
   './demo-guia.js',
   './tablero-negocio.js',
   './lista-precios.js',
   './canillas-adaptadores.js',
-  './vendor/pdf.min.js',
-  './vendor/pdf.worker.min.js',
-  './guia-adaptadores-psa.pdf',
   './stock-personal.js',
-  './vendor/zxing.min.js',
   './porque-vivo.js',
   './home-limpio.js',
   './home-tarjetas.js',
@@ -73,12 +69,6 @@ const APP_SHELL = [
   './appi-tema.css',
   './historico.css',
   './historico.js',
-  './vendor/xlsx.full.min.js',
-  './vendor/html2canvas.min.js',
-  './vendor/jspdf.umd.min.js',
-  './vendor/svg2pdf.umd.min.js',
-  './vendor/jszip.min.js',
-  './vendor/transformers.min.js',
   './manifest.json',
   './icon-192.png',
   './notification-badge.png',
@@ -97,7 +87,37 @@ const APP_SHELL = [
   './comparativas-img/burby.jpg'
 ];
 
-self.addEventListener('message', event=>{ if(event.data && event.data.type==='SKIP_WAITING') self.skipWaiting(); });
+// No compiten con el primer dibujo ni con la instalación crítica. APPI los
+// guarda más tarde, de a uno, y también quedan cacheados cuando una herramienta
+// los pide mediante appi-vendors.js.
+const OPTIONAL_SHELL = [
+  './vendor/hls.min.js',
+  './vendor/pdf.min.js',
+  './vendor/pdf.worker.min.js',
+  './vendor/zxing.min.js',
+  './vendor/xlsx.full.min.js',
+  './vendor/html2canvas.min.js',
+  './vendor/jspdf.umd.min.js',
+  './vendor/svg2pdf.umd.min.js',
+  './vendor/jszip.min.js',
+  './vendor/transformers.min.js'
+];
+
+async function warmOptionalShell(){
+  const cache=await caches.open(CACHE_NAME);
+  for(const url of OPTIONAL_SHELL){
+    if(await cache.match(url,{ignoreSearch:true}))continue;
+    try{
+      const response=await fetchWithTimeout(url,12000);
+      if(response.ok)await cache.put(url,response);
+    }catch(error){}
+  }
+}
+self.addEventListener('message', event=>{
+  if(!event.data)return;
+  if(event.data.type==='SKIP_WAITING')self.skipWaiting();
+  if(event.data.type==='APPI_WARM_OPTIONAL')event.waitUntil(warmOptionalShell());
+});
 const CORE_SHELL = ['./', './index.html', './manifest.json'];
 
 async function fetchWithTimeout(request, timeoutMs = 7000) {
