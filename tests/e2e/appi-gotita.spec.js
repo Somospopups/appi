@@ -8,7 +8,9 @@ const { test, expect } = require('@playwright/test');
 // despegue del cuerpo (el bug de transform-origin de la v904 beta).
 
 const USER_ID='33333333-3333-4333-8333-333333333333';
-const hoy=(()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)})();
+// La fecha de "hoy" se toma en Buenos Aires, igual que APPI: con la fecha UTC
+// el fixture se adelantaba un día a la tarde/noche y los pendientes no aparecían.
+const hoy=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Buenos_Aires'}).format(new Date());
 const CONTACTOS=[
   {id:'g1',estado:'seguimiento',nombre:'Marta Solís',telefono:'3515551001',telefono_normalizado:'3515551001',tipo:'contacto',proximo_contacto:hoy,created_at:new Date().toISOString(),updated_at:new Date().toISOString()}
 ];

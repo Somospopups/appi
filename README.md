@@ -6,6 +6,18 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v907 · «¿Qué hay en mi pantalla?»: Appi te hace un recorrido
+
+- **Una opción nueva adentro de Appi.** Al tocar el círculo de Appi, la caja abre con la fila **"¿Qué hay en mi pantalla?"** arriba de todo, destacada en celeste: *"Te lo muestro y te lo explico"*.
+- **El recorrido baja el telón:** la pantalla se oscurece y queda **iluminado un solo lugar** por vez, con un anillo celeste que late y la tarjeta crema de Appi explicándolo con palabras simples.
+- **Cada paso se mueve y se marca:** el recorrido lleva la vista hasta el lugar (desplazamiento suave), lo enmarca y la colita de la tarjeta apunta justo a lo que está mostrando, aunque scrollees o gires el teléfono.
+- **Se maneja como un cuento:** *"2 de 5"*, puntitos, **Atrás**, **Siguiente** y en el último paso **Terminar**. También con las flechas del teclado, y se cierra con **Escape** o la ×.
+- **Escuchar.** Cada paso se puede oír: Appi lo lee en voz alta (es-AR) con el mismo botón de siempre.
+- **Recorridos escritos** para Home, Mi mes, Mi negocio, Herramientas, Lista de precios, Mi stock, Usuarios, Gestión de contactos e Histórico. En las demás pantallas el recorrido se **arma solo** con las tarjetas y títulos que se ven, así nunca deja a nadie sin explicación.
+- **Si hay un aviso abierto**, el recorrido es sobre el aviso: qué es y dónde se cierra. Cuando lo cierran, lo vuelven a abrir para seguir con el resto de la pantalla (no se explica lo que está tapado).
+- Todo local: no hay red, ni IA remota, ni claves.
+- Versión: **v907 · Segura** → Cache `appi-v907-recorrido`.
+
 ## v906 · Appi es el círculo del «?»
 
 - **Se van los signos de pregunta.** El botón de ayuda de todas las pantallas (25 en total) es ahora el **círculo de Appi**: crema, con anillo celeste y su carita animada.

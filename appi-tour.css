@@ -1,0 +1,64 @@
+/* APPI · Recorrido guiado de la pantalla ("¿Qué hay en mi pantalla?"). */
+.appi-tour{position:fixed;inset:0;z-index:2147482000;pointer-events:none}
+.appi-tour[hidden]{display:none!important}
+html.appi-tour-abierto{overflow:hidden}
+/* el nido: un agujero de luz sobre el elemento, el resto queda oscuro */
+.tour-nido{
+  position:fixed;left:0;top:0;width:0;height:0;border-radius:18px;
+  box-shadow:0 0 0 9999px rgba(12,20,34,.62),0 0 0 2px rgba(94,193,242,.95),0 12px 32px rgba(8,16,30,.35);
+  transition:left .28s cubic-bezier(.3,1.1,.4,1),top .28s cubic-bezier(.3,1.1,.4,1),
+             width .28s cubic-bezier(.3,1.1,.4,1),height .28s cubic-bezier(.3,1.1,.4,1),border-radius .2s ease;
+}
+.tour-nido .tour-anillo{
+  position:absolute;inset:-6px;border-radius:24px;border:2px solid rgba(94,193,242,.85);
+  animation:tourLatido 2.2s ease-out infinite;
+}
+@keyframes tourLatido{
+  0%{transform:scale(.98);opacity:.85}
+  70%{transform:scale(1.06);opacity:0}
+  100%{transform:scale(1.06);opacity:0}
+}
+/* la tarjeta que explica */
+.tour-card{
+  position:fixed;pointer-events:auto;z-index:2147482001;
+  padding:13px 14px 11px;border-radius:20px;
+  background:linear-gradient(168deg,#fdfbf6,#f2ecdf);
+  border:1px solid rgba(40,36,28,.14);
+  box-shadow:0 22px 50px rgba(12,20,34,.34),inset 0 1px 0 #fff;
+  color:#283143;font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+.tour-card::after{
+  content:"";position:absolute;left:var(--punta,50%);bottom:-8px;width:16px;height:16px;
+  background:#f6f1e6;border-right:1px solid rgba(40,36,28,.14);border-bottom:1px solid rgba(40,36,28,.14);
+  transform:translateX(-50%) rotate(45deg);border-radius:0 0 4px 0;
+}
+.tour-card.tour-abajo::after{bottom:auto;top:-8px;background:#fdfbf6;border:0;border-left:1px solid rgba(40,36,28,.14);border-top:1px solid rgba(40,36,28,.14);border-radius:4px 0 0 0}
+.tour-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tour-paso{font-size:9.5px;font-weight:950;letter-spacing:.5px;text-transform:uppercase;color:#2b6f9e;
+  background:#e8f6fe;border:1px solid rgba(94,193,242,.5);border-radius:9px;padding:2px 8px}
+.tour-x{width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(40,36,28,.12);
+  border-radius:50%;background:#fff;color:#6b6455;font-size:17px;line-height:1;cursor:pointer}
+.tour-titulo{margin:8px 0 4px;font-size:16px;line-height:1.15;letter-spacing:-.3px;color:#1d2b3d}
+.tour-texto{margin:0;font-size:12.5px;line-height:1.5;color:#5b6472}
+.tour-botones{display:flex;align-items:center;gap:7px;margin-top:11px}
+.tour-botones button{font:inherit;font-weight:900;cursor:pointer;border-radius:12px;min-height:38px}
+.tour-escuchar{display:inline-flex;align-items:center;gap:5px;padding:0 10px;border:1px solid rgba(63,185,154,.4);background:#eaf7f3;color:#26725d;font-size:10.5px}
+.tour-escuchar svg{width:14px;height:14px}
+.tour-prev{padding:0 12px;border:1px solid rgba(40,36,28,.14);background:#fff;color:#3f4a5a;font-size:12px}
+.tour-next{margin-left:auto;padding:0 15px;border:0;background:#123c63;color:#fff;font-size:12.5px;
+  box-shadow:0 6px 16px rgba(18,60,99,.28)}
+.tour-prev:disabled{opacity:.4;cursor:default}
+.tour-puntitos{display:flex;gap:5px;justify-content:center;margin-top:9px}
+.tour-puntitos i{width:5px;height:5px;border-radius:50%;background:rgba(40,49,67,.2);transition:background .2s ease,transform .2s ease}
+.tour-puntitos i.on{background:#5ec1f2;transform:scale(1.5)}
+body.dark .tour-card{background:linear-gradient(168deg,#2c2936,#221f29);border-color:rgba(255,255,255,.14);color:#f2f0f7}
+body.dark .tour-titulo{color:#fff}
+body.dark .tour-texto{color:#c9c5d2}
+body.dark .tour-x{background:#3a3745;border-color:rgba(255,255,255,.12);color:#e7e2f0}
+body.dark .tour-prev{background:#3a3745;border-color:rgba(255,255,255,.12);color:#e7e2f0}
+body.dark .tour-paso{background:#2f4260;border-color:rgba(120,170,230,.35);color:#bcd6f7}
+@media(max-width:360px){.tour-card{padding:11px 12px 10px}.tour-titulo{font-size:15px}.tour-texto{font-size:12px}}
+@media(prefers-reduced-motion:reduce){
+  .tour-nido{transition:none}
+  .tour-nido .tour-anillo{animation:none}
+}

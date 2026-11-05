@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v906-circulo-de-appi';
+const CACHE_NAME = 'appi-v907-recorrido';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -32,6 +32,8 @@ const APP_SHELL = [
   './appi-assistant.css',
   './appi-assistant.js',
   './appi-buscar.js',
+  './appi-tour.js',
+  './appi-tour.css',
   './appi-gotita.css',
   './appi-gotita.js',
   './agenda-personal.js',

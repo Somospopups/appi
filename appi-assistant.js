@@ -1,4 +1,4 @@
-/* APPI v906 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
+/* APPI v907 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
 (function(){
   'use strict';
   const STATES=new Set(['normal','thinking','happy','surprise','alert']);
@@ -62,6 +62,19 @@
       try{b.click()}catch(e){console.error(e)}
       finally{setTimeout(function(){window.__appiHelpPassthrough=false},60)}
     },120);
+  }
+  // "¿Qué hay en mi pantalla?": cierra la caja y arranca el recorrido guiado.
+  function empezarRecorrido(){
+    close();
+    setTimeout(function(){
+      if(!window.APPITour){setState('alert');setCopy('No pude empezar el recorrido','Probá de nuevo en un segundo.');return}
+      const r=window.APPITour.empezar();
+      if(!r||!r.pasos){
+        open();setState('normal');setCopy('Esta pantalla todavía no tiene recorrido','Probá en Home, Mi mes, Mi negocio, Herramientas, Lista de precios o Mi stock.');
+        return;
+      }
+      setCopy('Recorrido de la pantalla','Te muestro cada parte, paso a paso.');
+    },260);
   }
   function saludar(ms){
     if(!root||!saludosOn)return;
@@ -140,6 +153,13 @@
             <button type="button" class="appi-search-mic" id="appiMic" aria-label="Hablar con Appi"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="10" rx="3" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3M9 20h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
             <button type="submit" class="appi-send" aria-label="Buscar">›</button>
           </form>
+          <button type="button" class="appi-row appi-row-tour" id="appiTourRow">
+            <span class="appi-row-ico c1 appi-row-ojo">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="3" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5a3.5 3.5 0 107 0 3.5 3.5 0 00-7 0z" stroke="currentColor" stroke-width="2"/><path d="M9 20.5h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            <span class="appi-row-txt"><b>¿Qué hay en mi pantalla?</b><i>Te lo muestro y te lo explico</i></span>
+            <span class="appi-row-chev" aria-hidden="true">›</span>
+          </button>
           <div class="appi-rows-title" id="appiRowsTitle">Lo que más usás</div>
           <div class="appi-rows" id="appiRows"></div>
           <button type="button" class="appi-row appi-row-help" id="appiHelpRow">
@@ -157,6 +177,7 @@
     gotita=el('appiGotita');if(window.APPIGotita)window.APPIGotita.mount(gotita);panelTitle=el('appiPanelTitle');message=el('appiMessage');heard=el('appiHeard');status=el('appiStatus');actionBtn=el('appiAction');input=el('appiInput');rowsHost=el('appiRows');rowsTitle=el('appiRowsTitle');resultsHost=el('appiResults');
     el('appiClose').addEventListener('click',close);
     el('appiHelpRow').addEventListener('click',ayudaDeLaPantalla);
+    el('appiTourRow').addEventListener('click',empezarRecorrido);
     el('appiMic').addEventListener('click',startVoice);
     el('appiForm').addEventListener('submit',event=>{
       event.preventDefault();

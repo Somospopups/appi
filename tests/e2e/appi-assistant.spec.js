@@ -1,7 +1,9 @@
 const { test, expect } = require('@playwright/test');
 
 const USER_ID='22222222-2222-4222-8222-222222222222';
-const hoy=(()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)})();
+// La fecha de "hoy" se toma en Buenos Aires, igual que APPI: con la fecha UTC
+// el fixture se adelantaba un día a la tarde/noche y los pendientes no aparecían.
+const hoy=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Buenos_Aires'}).format(new Date());
 const CONTACTOS=[
   {id:'a1',estado:'seguimiento',nombre:'Marta Solís',telefono:'3515551001',telefono_normalizado:'3515551001',tipo:'contacto',proximo_contacto:hoy,created_at:new Date().toISOString(),updated_at:new Date().toISOString()},
   {id:'a2',estado:'presentacion',nombre:'Juan Paz',telefono:'3515551002',telefono_normalizado:'3515551002',tipo:'contacto',proximo_contacto:hoy,created_at:new Date().toISOString(),updated_at:new Date().toISOString()}
