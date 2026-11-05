@@ -1,4 +1,4 @@
-/* APPI v907 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
+/* APPI v908 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
 (function(){
   'use strict';
   const STATES=new Set(['normal','thinking','happy','surprise','alert']);
@@ -138,10 +138,9 @@
           <div class="appi-top">
             <div class="appi-hero" aria-hidden="true">
               <div class="appi-gotita" id="appiGotita"></div>
-              <span class="appi-chip">Appi</span>
             </div>
             <div class="appi-top-txt">
-              <div class="appi-panel-head"><div class="appi-panel-status"><i></i><span id="appiStatus">Para ayudarte</span></div><button type="button" class="appi-panel-close" id="appiClose" aria-label="Cerrar Appi">×</button></div>
+              <div class="appi-panel-head"><div class="appi-panel-status"><i></i><span id="appiStatus">Appi está lista para ayudarte</span></div><button type="button" class="appi-panel-close" id="appiClose" aria-label="Cerrar Appi">×</button></div>
               <h2 id="appiPanelTitle">¿Qué necesitás?</h2>
             </div>
           </div>
@@ -162,11 +161,6 @@
           </button>
           <div class="appi-rows-title" id="appiRowsTitle">Lo que más usás</div>
           <div class="appi-rows" id="appiRows"></div>
-          <button type="button" class="appi-row appi-row-help" id="appiHelpRow">
-            <span class="appi-row-ico c4 appi-row-cara">${CARA_BTN}</span>
-            <span class="appi-row-txt"><b>¿Cómo funciona esta pantalla?</b><i>Te lo explico paso a paso</i></span>
-            <span class="appi-row-chev" aria-hidden="true">›</span>
-          </button>
           <div class="appi-results" id="appiResults" hidden></div>
           <button type="button" class="appi-action" id="appiAction"></button>
           <div class="appi-panel-foot"><span>Appi escucha sólo cuando la tocás.</span><button type="button" class="appi-speak" id="appiSpeak"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.5h3.2L12 5.6v12.8L7.2 14.5H4z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M15.4 8.6a4.6 4.6 0 0 1 0 6.8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span id="appiSpeakLabel">Escuchar</span></button></div>
@@ -176,7 +170,6 @@
     document.body.appendChild(root);
     gotita=el('appiGotita');if(window.APPIGotita)window.APPIGotita.mount(gotita);panelTitle=el('appiPanelTitle');message=el('appiMessage');heard=el('appiHeard');status=el('appiStatus');actionBtn=el('appiAction');input=el('appiInput');rowsHost=el('appiRows');rowsTitle=el('appiRowsTitle');resultsHost=el('appiResults');
     el('appiClose').addEventListener('click',close);
-    el('appiHelpRow').addEventListener('click',ayudaDeLaPantalla);
     el('appiTourRow').addEventListener('click',empezarRecorrido);
     el('appiMic').addEventListener('click',startVoice);
     el('appiForm').addEventListener('submit',event=>{
@@ -256,7 +249,7 @@
   function setState(state){
     state=STATES.has(state)?state:'normal';
     root.dataset.state=state;if(window.APPIGotita)window.APPIGotita.setState(gotita,state);
-    const labels={normal:'Lista para ayudarte',thinking:'Pensando y buscando',happy:'¡Listo!',surprise:'Encontré algo interesante',alert:'Necesito tu atención'};
+    const labels={normal:'Appi está lista para ayudarte',thinking:'Pensando y buscando',happy:'¡Listo!',surprise:'Encontré algo interesante',alert:'Necesito tu atención'};
     status.textContent=labels[state];
     if(state!=='normal')root.classList.remove('appi-listening');
   }

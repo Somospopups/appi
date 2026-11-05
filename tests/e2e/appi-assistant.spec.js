@@ -60,7 +60,9 @@ test('el «?» de cada pantalla es el círculo de Appi',async({page})=>{
   await abrirConElCirculo(page);
   await expect(page.locator('#appiPanel')).toBeVisible();
   await expect(page.locator('#appiGotita svg.go')).toHaveCount(1);
-  await expect(page.locator('.appi-chip')).toHaveText('Appi');
+  // arriba de todo dice que está lista, y el personaje ya no lleva el cartelito con su nombre
+  await expect(page.locator('#appiStatus')).toHaveText('Appi está lista para ayudarte');
+  await expect(page.locator('.appi-chip')).toHaveCount(0);
   const caja=await page.evaluate(()=>{const p=document.querySelector('#appiPanel').getBoundingClientRect();return{top:p.top,right:p.right,vw:innerWidth}});
   expect(caja.top).toBeLessThan(90);              // pegada arriba, debajo del círculo
   expect(Math.abs(caja.right-(caja.vw-8))).toBeLessThan(3);
@@ -69,16 +71,15 @@ test('el «?» de cada pantalla es el círculo de Appi',async({page})=>{
   await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
 });
 
-test('la ayuda de la pantalla sigue disponible adentro de Appi',async({page})=>{
+test('no hay dos opciones que expliquen la pantalla',async({page})=>{
   await entrar(page);
   await abrirConElCirculo(page);
-  const fila=page.locator('#appiHelpRow');
-  await expect(fila).toContainText('¿Cómo funciona esta pantalla?');
-  await fila.click();
-  // Se cierra Appi y aparece la explicación de la pantalla en la que estaba.
-  await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
-  await expect(page.locator('.modal-overlay.open')).toBeVisible();
-  await expect(page.locator('.modal-overlay.open')).toContainText('Pantalla principal');
+  // La explicación de la pantalla es una sola: el recorrido.
+  await expect(page.locator('#appiAssistant')).not.toContainText('¿Cómo funciona esta pantalla?');
+  await expect(page.locator('#appiHelpRow')).toHaveCount(0);
+  const filas=await page.locator('#appiAssistant .appi-row').allInnerTexts();
+  expect(filas.filter(t=>/pantalla/i.test(t)).length).toBe(1);
+  await expect(page.locator('#appiTourRow')).toContainText('¿Qué hay en mi pantalla?');
 });
 
 test('la caja abre arriba a la derecha y no tapa el dock',async({page})=>{

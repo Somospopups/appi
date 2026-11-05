@@ -161,13 +161,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=907"></script>
+  <script src="./campus-psa.js?v=908"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=907"></script>
+<script src="./lista-precios.js?v=908"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4665,13 +4665,13 @@ html body .lp-fab{
 }
 </style>
 
-<link rel="stylesheet" href="./appi-gotita.css?v=907">
-<link rel="stylesheet" href="./appi-assistant.css?v=907">
-<link rel="stylesheet" href="./appi-tour.css?v=907">
-<script src="./appi-gotita.js?v=907" defer></script>
-<script src="./appi-assistant.js?v=907" defer></script>
-<script src="./appi-buscar.js?v=907" defer></script>
-<script src="./appi-tour.js?v=907" defer></script>
+<link rel="stylesheet" href="./appi-gotita.css?v=908">
+<link rel="stylesheet" href="./appi-assistant.css?v=908">
+<link rel="stylesheet" href="./appi-tour.css?v=908">
+<script src="./appi-gotita.js?v=908" defer></script>
+<script src="./appi-assistant.js?v=908" defer></script>
+<script src="./appi-buscar.js?v=908" defer></script>
+<script src="./appi-tour.js?v=908" defer></script>
 </head>
 <body>
 
@@ -4785,7 +4785,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v907 · Segura</div>
+  <div class="ds-foot">APPI · v908 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14418,8 +14418,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='907';
-    const CACHE_NAME='appi-v907-recorrido';
+    const swVersion='908';
+    const CACHE_NAME='appi-v908-lista-para-ayudarte';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

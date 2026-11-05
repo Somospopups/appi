@@ -71,7 +71,7 @@
   border-radius:inherit;
 }
 .appi-panel-head{display:flex;align-items:center;justify-content:space-between;gap:9px}
-.appi-panel-status{display:flex;align-items:center;gap:7px;color:#566175;font-size:9.5px;font-weight:950;letter-spacing:.45px;text-transform:uppercase}
+.appi-panel-status{display:flex;align-items:center;gap:7px;color:#65716a;font-size:10.5px;font-weight:750;letter-spacing:0;text-transform:none;line-height:1.2}
 .appi-panel-status i{width:8px;height:8px;border-radius:50%;background:var(--appi-mint);box-shadow:0 0 0 4px rgba(63,185,154,.12)}
 #appiAssistant[data-state="thinking"] .appi-panel-status i{background:#786bc4;animation:appiStatus 1s infinite}
 #appiAssistant[data-state="happy"] .appi-panel-status i{background:var(--appi-mint);animation:appiStatus 1.2s 2}
@@ -96,8 +96,8 @@
 #appiAssistant.appi-listening .appi-search-mic{background:#e5a036;animation:appiMicPulse 1.1s ease-in-out infinite}
 @keyframes appiMicPulse{0%,100%{box-shadow:0 0 0 0 rgba(229,160,54,.5)}60%{box-shadow:0 0 0 8px rgba(229,160,54,0)}}
 .appi-search .appi-send{width:32px;height:32px;flex:none;border:0;border-radius:10px;background:#e7effb;color:#3f6ead;cursor:pointer;font-size:18px;font-weight:900;line-height:1}
-.appi-rows-title{margin:13px 0 7px;color:#8b93a1;font-size:9.5px;font-weight:950;letter-spacing:.5px;text-transform:uppercase}
-.appi-rows{display:flex;flex-direction:column;gap:6px}
+.appi-rows-title{margin:4px 0 8px;color:#8b93a1;font-size:9.5px;font-weight:950;letter-spacing:.5px;text-transform:uppercase}
+.appi-rows{display:flex;flex-direction:column;gap:8px}
 
 .appi-row{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:1px solid rgba(55,64,91,.07);border-radius:13px;background:#f7f9fc;cursor:pointer;text-align:left;transition:transform .12s ease,background .2s ease}
 .appi-row:active{transform:scale(.985);background:#eef2f8}
@@ -188,7 +188,7 @@ body.appi-login-abierto .help-btn,body.appi-admin .help-btn{display:none!importa
 .appi-row:active{background:#f7f2e6!important}
 .appi-row-help{margin-top:7px}
 /* la fila del recorrido: la primera de todas, con el ícono de la pantalla */
-.appi-row-tour{margin-bottom:9px;background:linear-gradient(160deg,#eef8fe,#e3f3fd)!important;border-color:rgba(94,193,242,.5)!important}
+.appi-row-tour{margin-top:11px;margin-bottom:12px;background:linear-gradient(160deg,#eef8fe,#e3f3fd)!important;border-color:rgba(94,193,242,.5)!important}
 .appi-row-tour .appi-row-txt b{color:#17405f}
 .appi-row-ojo{background:#fff!important;color:#3f8fc6;border:1px solid rgba(94,193,242,.45)}
 .appi-row-cara{background:#e8f6fe!important;padding:5px}

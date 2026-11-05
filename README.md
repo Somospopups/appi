@@ -6,6 +6,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v908 · La caja de Appi, más clara
+
+- **Se fue la opción repetida.** "¿Cómo funciona esta pantalla?" explicaba lo mismo que el recorrido nuevo: ahora hay **una sola** forma de pedir la explicación de la pantalla, *"¿Qué hay en mi pantalla?"*.
+- **"Appi está lista para ayudarte" arriba de todo**, con el punto verde al lado. El cartelito con el nombre *Appi* que estaba abajo del personaje ya no está: el nombre aparece en el saludo y en el título.
+- **Más aire entre las opciones:** 11 px entre el buscador y la primera opción (antes quedaba pegada), 12 px hasta el título de la sección y 8 px entre una opción y la siguiente.
+- Versión: **v908 · Segura** → Cache `appi-v908-lista-para-ayudarte`.
+
 ## v907 · «¿Qué hay en mi pantalla?»: Appi te hace un recorrido
 
 - **Una opción nueva adentro de Appi.** Al tocar el círculo de Appi, la caja abre con la fila **"¿Qué hay en mi pantalla?"** arriba de todo, destacada en celeste: *"Te lo muestro y te lo explico"*.

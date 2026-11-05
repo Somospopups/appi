@@ -1,4 +1,4 @@
-/* APPI v907 · Buscador de Appi.
+/* APPI v908 · Buscador de Appi.
    Busca en todo lo que ya está en el teléfono: usuarios (con sus purificadores
    y números de serie), distribuidores del equipo, contactos del Panel y
    pantallas de la app. No consulta internet: todo sale del aparato. */
