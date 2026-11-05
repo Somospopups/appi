@@ -161,13 +161,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=911"></script>
+  <script src="./campus-psa.js?v=912"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=911"></script>
+<script src="./lista-precios.js?v=912"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4665,13 +4665,13 @@ html body .lp-fab{
 }
 </style>
 
-<link rel="stylesheet" href="./appi-gotita.css?v=911">
-<link rel="stylesheet" href="./appi-assistant.css?v=911">
-<link rel="stylesheet" href="./appi-tour.css?v=911">
-<script src="./appi-gotita.js?v=911" defer></script>
-<script src="./appi-assistant.js?v=911" defer></script>
-<script src="./appi-buscar.js?v=911" defer></script>
-<script src="./appi-tour.js?v=911" defer></script>
+<link rel="stylesheet" href="./appi-gotita.css?v=912">
+<link rel="stylesheet" href="./appi-assistant.css?v=912">
+<link rel="stylesheet" href="./appi-tour.css?v=912">
+<script src="./appi-gotita.js?v=912" defer></script>
+<script src="./appi-assistant.js?v=912" defer></script>
+<script src="./appi-buscar.js?v=912" defer></script>
+<script src="./appi-tour.js?v=912" defer></script>
 </head>
 <body>
 
@@ -4785,7 +4785,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v911 · Segura</div>
+  <div class="ds-foot">APPI · v912 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9743,9 +9743,7 @@ function bindEquipoContactPanel(cont){cont.querySelectorAll('[data-eqstatus]').f
 function compartirRankingEquipo(modo){
   if(!equipoData || !equipoData.personas) return;
   const esOrg = modo === 'organizacion';
-  const lista = esOrg
-    ? [...equipoData.personas].map(p => ({...p, pbOrg: calcularPBOrganizacion(p)})).filter(p => p.pbOrg > 0).sort((a,b)=> b.pbOrg - a.pbOrg).slice(0, 10)
-    : [...equipoData.personas].sort((a,b)=> (b.pnAct||0) - (a.pnAct||0)).filter(p => (p.pnAct||0) > 0).slice(0, 10);
+  const lista = rankingEquipoTop(modo); // mismo ranking que en pantalla (con el titular)
   if(!lista.length){
     if(window.APPIDialog) window.APPIDialog.alert('Todavía no hay datos para compartir en este ranking.',{title:'Ranking',icon:'🏆'});
     return;
@@ -9765,6 +9763,90 @@ function compartirRankingEquipo(modo){
   if(typeof enviarMensajeWhatsApp==='function') enviarMensajeWhatsApp(msg, titulo);
   else if(window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(msg));
 }
+/* v912 · El titular también entra al ranking de ventas del Tablero.
+   Su fila (nivel 0) no forma parte de la Línea Descendente: vive aparte en
+   equipoData.titular. Por eso, aunque su volumen personal exista (lo ve en
+   Mi negocio → Reporte de Bonos), el ranking del Tablero lo dejaba afuera.
+   Se usa su PB del cierre y, si no viene, el "Volumen Personal" de Bonos. */
+function volumenPersonalTitularAppi(){
+  let pb = 0;
+  try{
+    const t = (typeof equipoData!=='undefined' && equipoData && equipoData.titular) || {};
+    const v = Number(String(t.pbPersonal==null?'':t.pbPersonal).toString().replace(/\./g,'').replace(',','.'));
+    if(!isNaN(v)) pb = v;
+  }catch(e){}
+  if(!(pb>0)){
+    try{
+      const c = JSON.parse(localStorage.getItem('appi_bonos_v1')||'null');
+      const a = c && c.bonos && c.bonos.acumulacion;
+      if(Array.isArray(a)){
+        const f = a.find(x=>/volumen\s*personal/i.test(String((x&&x.r)||'')));
+        if(f){
+          const st = String(f.pb==null?'':f.pb).trim();
+          let v = (typeof parsePB==='function') ? parsePB(st) : Number(st.replace(/\./g,'').replace(',','.'));
+          if(!isNaN(v)) pb = v;
+        }
+      }
+    }catch(e){}
+  }
+  return pb>0 ? pb : 0;
+}
+function nombreTitularAppi(){
+  let nombre = '';
+  try{ const t=(typeof equipoData!=='undefined'&&equipoData&&equipoData.titular)||{}; nombre=String(t.nombre||'').trim(); }catch(e){}
+  if(nombre) return nombre;
+  try{ const c=JSON.parse(localStorage.getItem('appi_bonos_v1')||'null'); nombre=String((c&&c.bonos&&c.bonos.nombre)||'').trim(); }catch(e){}
+  return nombre || 'Titular';
+}
+function personaTitularRanking(){
+  if(typeof equipoData==='undefined'||!equipoData) return null;
+  const pb = volumenPersonalTitularAppi();
+  if(!(pb>0)) return null;
+  const t = equipoData.titular || {};
+  return {id:'titular', esTitular:true, nombre:nombreTitularAppi(), codigo:String(t.dip||''),
+    cat:String(t.categoria||t.cat||'L').toUpperCase(), pnAct:pb, m1:0, m2:0, m3:0,
+    garantias:{presentadas:0,vencidas:0,pendientes:0}};
+}
+/* Mismo ranking para la pantalla y para compartir: el titular nunca puede
+   faltar y nunca se duplica (si su fila llegó como persona, se descarta). */
+function rankingEquipoTop(modo){
+  if(typeof equipoData==='undefined'||!equipoData||!Array.isArray(equipoData.personas)) return [];
+  const t = equipoData.titular || {};
+  const digitos = x => String(x==null?'':x).replace(/\D/g,'');
+  const dipTitular = digitos(t.dip), nombreTitular = String(t.nombre||'').trim().toUpperCase(), esOrg = modo==='organizacion';
+  const base = equipoData.personas.filter(p=>{
+    if(!p || p.esTitular) return false;
+    if(dipTitular && digitos(p.codigo)===dipTitular) return false;
+    if(nombreTitular && String(p.nombre||'').trim().toUpperCase()===nombreTitular) return false;
+    return true;
+  });
+  const titular = personaTitularRanking();
+  if(!esOrg){
+    const lista = base.filter(p=>(p.pnAct||0)>0).map(p=>({...p}));
+    if(titular) lista.push(titular);
+    return lista.sort((a,b)=>(b.pnAct||0)-(a.pnAct||0)).slice(0,10);
+  }
+  const lista = base.map(p=>{ const copia={...p}; copia.pbOrg=calcularPBOrganizacion(p); return copia; }).filter(p=>p.pbOrg>0);
+  if(titular){
+    const red = base.reduce((suma,p)=>suma+Number(p.pnAct||0),0);
+    lista.push({...titular, pbOrg:(titular.pnAct||0)+red});
+  }
+  return lista.sort((a,b)=>b.pbOrg-a.pbOrg).slice(0,10);
+}
+function explicarTitularRanking(){
+  const t = personaTitularRanking();
+  if(!t) return;
+  let origen = 'de tu cierre mensual';
+  try{
+    const tl = (typeof equipoData!=='undefined'&&equipoData&&equipoData.titular)||{};
+    const v = Number(String(tl.pbPersonal==null?'':tl.pbPersonal).toString().replace(/\./g,'').replace(',','.'));
+    if(!(v>0)) origen = 'del Volumen Personal de tu Reporte de Bonos';
+  }catch(e){}
+  const html = `<p><b>${formatPB(t.pnAct)} PB personales</b>, ${origen}.</p>
+    <p style="margin-top:8px">Tu fila no viene en la Línea Descendente del equipo (el archivo sólo lista a tus patrocinados), así que APPI la agrega al ranking con tu volumen personal.</p>`;
+  if(window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert(html,{title:'Vos en el ranking',icon:'⭐'});
+  else showToast(`${formatPB(t.pnAct)} PB personales`);
+}
 function renderEquipoDashboard(){
   const cont = document.getElementById('equipoContent');
   const personas = equipoData.personas;
@@ -9782,12 +9864,8 @@ function renderEquipoDashboard(){
   const catsPresentes = catsOrden.filter(c => porCat[c]).concat(Object.keys(porCat).filter(c => !catsOrden.includes(c) && CAT_INFO[c]));
   const maxCat = Math.max(...Object.values(porCat));
     // Top según el modo seleccionado
-  const top10Personal = [...personas].sort((a,b)=> (b.pnAct||0) - (a.pnAct||0)).filter(p => (p.pnAct||0) > 0).slice(0, 10);
-  const top10Organizacion = [...personas].map(p => ({...p, pbOrg: calcularPBOrganizacion(p)}))
-    .filter(p => p.pbOrg > 0)
-    .sort((a,b)=> b.pbOrg - a.pbOrg)
-    .slice(0, 10);
-  const top10 = equipoTopMode === 'personal' ? top10Personal : top10Organizacion;
+  // v912: incluye al titular (su fila no viene en la Línea Descendente).
+  const top10 = rankingEquipoTop(equipoTopMode);
   const hoy = new Date();
   const bdayMes = personas.filter(p => {
     if(!p.cumple) return false;
@@ -10005,6 +10083,7 @@ ${(function(){
   cont.querySelectorAll('[data-persona]').forEach(el=>{
     el.onclick = (e)=>{
       if(e.target.closest('.bd-call')) return;
+      if(el.dataset.persona === 'titular'){ explicarTitularRanking(); return; }
       const p = equipoData.personas.find(x => x.id === +el.dataset.persona);
       if(p) openPersonaModal(p);
     };
@@ -14418,8 +14497,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='911';
-    const CACHE_NAME='appi-v911-ranking-completo';
+    const swVersion='912';
+    const CACHE_NAME='appi-v912-ranking-completo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

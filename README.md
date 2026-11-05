@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v912 · El titular también entra al ranking del Tablero
+
+- **El ranking de ventas del Tablero** (`Mi negocio → Tablero`, con sus pestañas Personal y Organización y los cumpleaños debajo) es **otro componente**: se arma con la Línea Descendente, donde la fila del titular (nivel 0) no viene. Por eso el titular no aparecía **aunque sus datos ya estuvieran cargados** — las correcciones anteriores tocaban el ranking del Histórico, no éste.
+- Ahora el Tablero agrega al titular con su **volumen personal**: primero el del cierre (`equipoData.titular.pbPersonal`) y, si no viene, el **"Volumen Personal" del Reporte de Bonos** (`appi_bonos_v1`).
+- En **Personal** aparece con su PB personal; en **Organización**, con lo suyo más toda su red.
+- **No se duplica**: si su fila llegó dentro de las personas, se descarta del árbol para el ranking.
+- Tocar su fila explica de dónde salió el número. El ranking que se comparte por WhatsApp usa exactamente la misma lista.
+- Si no hay ningún volumen personal, no se inventa un puesto.
+- Versión: **v912 · Segura** → Cache `appi-v912-ranking-completo`.
+
 ## v911 · Tu volumen personal entra al ranking aunque Bonos sea de otro mes
 
 - **Caso real que seguía fallando**: cierre de *octubre* y Reporte de Bonos de *noviembre*. La v910 exigía el mismo mes, así que el 47,65 del titular no se usaba y volvía a quedar afuera.

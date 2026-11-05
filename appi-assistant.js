@@ -1,4 +1,4 @@
-/* APPI v911 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
+/* APPI v912 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
 (function(){
   'use strict';
   const STATES=new Set(['normal','thinking','happy','surprise','alert']);
