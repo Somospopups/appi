@@ -7,24 +7,84 @@
       "nombre": "CyberMonday",
       "desde": "2026-11-01",
       "hasta": "2026-11-04",
-      "aplica": ["normal", "canje"],
+      "aplica": [
+        "normal",
+        "canje"
+      ],
       "no_acumulable": true,
       "financiacion": "Cuotas sin interés y reintegros según banco y tarjeta seleccionados; el reintegro no se descuenta del total.",
       "productos": [
-        {"familia": "PSA Vero", "porcentaje": 45, "aplica": ["normal", "canje"], "skus": ["611030420"]},
-        {"familia": "PSA Iontrix 3", "porcentaje": 25, "aplica": ["normal", "canje"], "skus": ["611290050"]},
-        {"familia": "PSA Senior4", "porcentaje": 10, "aplica": ["normal", "canje"], "skus": ["611010510", "611010530", "611010550", "611010560"]},
+        {
+          "familia": "PSA Vero",
+          "porcentaje": 45,
+          "aplica": [
+            "normal",
+            "canje"
+          ],
+          "skus": [
+            "611030420"
+          ]
+        },
+        {
+          "familia": "PSA Iontrix 3",
+          "porcentaje": 25,
+          "aplica": [
+            "normal",
+            "canje"
+          ],
+          "skus": [
+            "611290050"
+          ]
+        },
+        {
+          "familia": "PSA Senior4",
+          "porcentaje": 10,
+          "aplica": [
+            "normal",
+            "canje"
+          ],
+          "skus": [
+            "611010510",
+            "611010530",
+            "611010550",
+            "611010560"
+          ]
+        },
         {
           "familia": "Productos seleccionados",
           "porcentaje": 10,
-          "aplica": ["canje"],
-          "skus": [
-            "611010580", "611030430", "613030480", "613030470", "611030410", "611030400",
-            "611030610", "611030620", "611100240", "611100250", "611100280", "611100290",
-            "611100320", "611100330", "611120220", "611120200", "611120210", "611030560",
-            "611030540", "617110040", "617110050", "611310070"
+          "aplica": [
+            "canje"
           ],
-          "nombres": ["PSA OSMOSIS ROTECH BM UV", "PSA OSMOSIS ROTECH SM UV", "PSA AIRPURIFIER 220V"]
+          "skus": [
+            "611010580",
+            "611030430",
+            "613030480",
+            "613030470",
+            "611030410",
+            "611030400",
+            "611030610",
+            "611030620",
+            "611100240",
+            "611100250",
+            "611100280",
+            "611100290",
+            "611100320",
+            "611100330",
+            "611120220",
+            "611120200",
+            "611120210",
+            "611030560",
+            "611030540",
+            "617110040",
+            "617110050",
+            "611310070"
+          ],
+          "nombres": [
+            "PSA OSMOSIS ROTECH BM UV",
+            "PSA OSMOSIS ROTECH SM UV",
+            "PSA AIRPURIFIER 220V"
+          ]
         }
       ]
     },
@@ -33,13 +93,47 @@
       "nombre": "CyberWeek",
       "desde": "2026-11-05",
       "hasta": "2026-11-08",
-      "aplica": ["normal", "canje"],
+      "aplica": [
+        "normal",
+        "canje"
+      ],
       "no_acumulable": true,
       "financiacion": "Cuotas sin interés y reintegros según banco y tarjeta seleccionados; el reintegro se informa y no se descuenta del total.",
       "productos": [
-        {"familia": "PSA Iontrix 3", "porcentaje": 25, "aplica": ["normal", "canje"], "skus": ["611290050"]},
-        {"familia": "PSA Senior4", "porcentaje": 10, "aplica": ["normal", "canje"], "skus": ["611010510", "611010530", "611010550", "611010560", "611010730"]},
-        {"familia": "resto de productos", "porcentaje": 10, "aplica": ["canje"], "todos_con_canje": true}
+        {
+          "familia": "PSA Iontrix 3",
+          "porcentaje": 25,
+          "aplica": [
+            "normal",
+            "canje"
+          ],
+          "skus": [
+            "611290050"
+          ]
+        },
+        {
+          "familia": "PSA Senior4",
+          "porcentaje": 10,
+          "aplica": [
+            "normal",
+            "canje"
+          ],
+          "skus": [
+            "611010510",
+            "611010530",
+            "611010550",
+            "611010560",
+            "611010730"
+          ]
+        },
+        {
+          "familia": "resto de productos",
+          "porcentaje": 10,
+          "aplica": [
+            "canje"
+          ],
+          "todos_con_canje": true
+        }
       ]
     }
   ]
