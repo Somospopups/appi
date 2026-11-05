@@ -1,5 +1,12 @@
 # APPI
 
+## v919 · Tarjetas primero
+
+- Las tarjetas inteligentes del Home son lo primero que aparece: ya no esperan a la nube.
+- Con la sesión de más de 7 días y red lenta el mazo salía a los 9,4 s; si la nube no contestaba, no salía nunca. Ahora abre en ~0,65 s con los datos del teléfono y se completa solo al sincronizar.
+- La espera del mazo no se rinde más a los 6,4 s: sigue viva mientras dure la visita.
+- Versión: **v919 · Segura** → Cache `appi-v919-tarjetas-primero`.
+
 ## v918 · Inicio inmediato
 
 - Reanudación local segura: Home primero; validación y nube en segundo plano.

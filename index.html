@@ -136,7 +136,7 @@ window.openStock=function(){
      la app, para que el gesto de atrás cierre el panel abierto y no navegue. -->
 <script src="./panel-atras.js?v=618"></script>
 <script src="./auth-config.js"></script>
-<script src="./appi-vendors.js?v=918"></script>
+<script src="./appi-vendors.js?v=919"></script>
 <script src="./appi-dialog.js?v=618"></script>
 <script src="./appi-popup-effects.js?v=865"></script>
 <script src="./appi-notif.js?v=894"></script>
@@ -144,17 +144,17 @@ window.openStock=function(){
 <script src="./appi-onboarding.js?v=898"></script>
 <script src="./telefono.js?v=639"></script>
 <script src="./whatsapp-app.js?v=618"></script>
-<script src="./auth-client.js?v=918"></script>
+<script src="./auth-client.js?v=919"></script>
 <script src="./prueba-banner.js?v=618"></script>
-<script src="./data-sync.js?v=918"></script>
+<script src="./data-sync.js?v=919"></script>
 <script src="./js/membership-admin.js?v=618"></script>
-<script src="./admin-panel.js?v=918"></script>
+<script src="./admin-panel.js?v=919"></script>
 <script src="./js/compromiso-pago.js?v=618"></script>
 <link rel="stylesheet" href="./css/membership-admin.css?v=618">
 <link rel="stylesheet" href="./appi-tema.css?v=618">
 <script src="./account-request.js?v=618"></script>
 <script src="./qr-code.js?v=618"></script>
-<script src="./gestion-client.js?v=918"></script>
+<script src="./gestion-client.js?v=919"></script>
   <script src="./agenda-personal.js?v=618"></script>
 <script src="./margarita-contactos.js?v=638"></script>
 <script src="./tarjetas-promos.js?v=618"></script>
@@ -162,20 +162,20 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=914"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=918"></script>
+  <script src="./campus-psa.js?v=919"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=918"></script>
+<script src="./lista-precios.js?v=919"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
-<script src="./stock-personal.js?v=918"></script>
+<script src="./stock-personal.js?v=919"></script>
 
 <script src="./porque-vivo.js?v=618"></script>
 <script src="./home-limpio.js?v=618"></script>
 <script src="./reporte-bonos.js?v=633"></script>
-  <script src="./home-tarjetas.js?v=914"></script>
+  <script src="./home-tarjetas.js?v=919"></script>
   <script src="./appi-eventos.js?v=618"></script>
   <script src="./tu-mes.js?v=618"></script>
   <script src="./device-bridge.js?v=618"></script>
@@ -4662,15 +4662,15 @@ html body .lp-fab{
 
 <!-- No bloquear el primer dibujo de Android por una hoja externa: el estilo
      principal ya está inline y estos módulos se aplican apenas llegan. -->
-<link rel="stylesheet" href="./appi-gotita.css?v=918" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="./appi-progreso.css?v=918" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="./appi-assistant.css?v=918" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="./appi-tour.css?v=918" media="print" onload="this.media='all'">
-<script src="./appi-gotita.js?v=918" defer></script>
-<script src="./appi-progreso.js?v=918" defer></script>
-<script src="./appi-assistant.js?v=918" defer></script>
-<script src="./appi-buscar.js?v=918" defer></script>
-<script src="./appi-tour.js?v=918" defer></script>
+<link rel="stylesheet" href="./appi-gotita.css?v=919" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-progreso.css?v=919" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-assistant.css?v=919" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-tour.css?v=919" media="print" onload="this.media='all'">
+<script src="./appi-gotita.js?v=919" defer></script>
+<script src="./appi-progreso.js?v=919" defer></script>
+<script src="./appi-assistant.js?v=919" defer></script>
+<script src="./appi-buscar.js?v=919" defer></script>
+<script src="./appi-tour.js?v=919" defer></script>
 </head>
 <body>
 
@@ -4784,7 +4784,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v918 · Segura</div>
+  <div class="ds-foot">APPI · v919 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14643,8 +14643,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='918';
-    const CACHE_NAME='appi-v918-inicio-inmediato';
+    const swVersion='919';
+    const CACHE_NAME='appi-v919-tarjetas-primero';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

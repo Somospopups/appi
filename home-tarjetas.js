@@ -2442,9 +2442,15 @@
     }catch(e){ return false; }
   }
   var autoAbierto = false;
-  // El mazo aparece recién cuando la app terminó de cargar DE VERDAD:
-  // sin pantalla de arranque, sin la elección de titular/socio abierta,
-  // con la sesión autorizada. Antes de eso, espera.
+  // v919 · El mazo es la función estrella: aparece en cuanto la app dejó de
+  // estar cubierta, sin pantalla de arranque y sin la elección de titular/socio
+  // abierta. YA NO espera a la sesión autorizada contra la nube. Las tarjetas se
+  // arman con lo que hay en el teléfono (`listaUsuariosHome()` lee la planilla
+  // de localStorage) y `repintarSiCambio()` las completa cuando llega la
+  // sincronización. Antes esta puerta exigía `isLocallyAuthorized()`, que con la
+  // sesión de más de `offlineDays` —lo habitual en quien abre la app cada
+  // tanto— depende de un pedido a la nube sin tiempo máximo: medido, el mazo
+  // salía a los 9,4 s con 4G débil y NO salía nunca si la nube no contestaba.
   function appTerminoDeCargar(){
     try{
       var boot = document.getElementById('bootScreen');
@@ -2452,25 +2458,38 @@
       var persona = document.getElementById('personChoiceOverlay');
       if (persona && !persona.hidden) return false;
       if (window.__appiCubriendoInicio) return false;
+      // La elección de titular/socio sí bloquea: sin eso las tarjetas mostrarían
+      // los números de otra persona.
       if (window.APPIAuth && window.APPIAuth.isEnabled && window.APPIAuth.isEnabled()){
-        if (window.APPIAuth.isLocallyAuthorized && !window.APPIAuth.isLocallyAuthorized()) return false;
         if (window.APPIAuth.needsPersonChoice && window.APPIAuth.needsPersonChoice()) return false;
       }
       return true;
     }catch(e){ return false; }
   }
+  // v919 · La espera no se rinde más. Cortaba a los 6,4 s (400 × 16 ms) y, como
+  // `autoAbierto` ya estaba en true, el mazo no volvía a abrirse en toda la
+  // visita: con la red lenta la distribuidora se quedaba sin tarjetas hasta
+  // salir del Home y volver a entrar. Ahora reintenta mientras la app viva, con
+  // un escalonado que abre al instante cuando se puede y no gasta batería
+  // después: 16 ms los primeros 2 s, 250 ms hasta los 10 s, 1 s de ahí en más.
+  var esperandoApertura = false;
   function alEntrarAlHome(){
     if (!sesionDeDistribuidor() || !esHome()) return;
     css();
-    if (autoAbierto) return;
+    if (autoAbierto || esperandoApertura) return;
     autoAbierto = true;
     if (localStorage.getItem('appi_tarjetas_auto') === '0') return;
-    var intentos = 0;
+    esperandoApertura = true;
+    var empezo = Date.now();
     (function esperar(){
-      if (!esHome() || document.getElementById('htOverlay')) return;
-      if (++intentos > 400) return;
-      if (!appTerminoDeCargar()){ setTimeout(esperar, 16); return; }
-      if (esHome() && !document.getElementById('htOverlay')) abrir();
+      if (document.getElementById('htOverlay')){ esperandoApertura = false; return; }
+      // Si se fue del Home la espera queda en suspenso (no se cancela): al volver
+      // abre el mazo sin depender de otro `showView`.
+      if (esHome() && appTerminoDeCargar()){
+        if (abrir()){ esperandoApertura = false; return; }
+      }
+      var paso = Date.now() - empezo;
+      setTimeout(esperar, paso < 2000 ? 16 : (paso < 10000 ? 250 : 1000));
     })();
   }
 
@@ -2575,6 +2594,12 @@
   window.addEventListener('appi-datasync-applied', repintarSiCambio);
   window.addEventListener('appi-linea-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
   window.addEventListener('appi-bonos-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
+  // v919: la planilla se analiza en segundo plano (a los 8 s del arranque, o al
+  // entrar a la vista Usuarios). Con el mazo abierto enseguida —que ahora se
+  // arma con lo que hay en el teléfono— faltaba este aviso: sin él las tarjetas
+  // de clientes y de garantía seguían con la lista sin agrupar hasta que una
+  // sincronización cualquiera las repintara.
+  window.addEventListener('appi-usuarios-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
 
   // v642 · El mazo se refresca cuando llega el contenido del Campus o cuando
   // avanza el avance de una clase (la tarjeta cambia sus chips al instante).

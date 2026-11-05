@@ -102,7 +102,7 @@ test.describe('arranque PWA real en Android', () => {
       }
     });
     await expect.poll(() => page.evaluate(async () => {
-      const cache=await caches.open('appi-v918-inicio-inmediato');
+      const cache=await caches.open('appi-v919-tarjetas-primero');
       return !!(await cache.match('./index.html'));
     }), { timeout: 15000 }).toBe(true);
 

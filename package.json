@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "918.0.0",
-  "cacheName": "appi-v918-inicio-inmediato",
+  "version": "919.0.0",
+  "cacheName": "appi-v919-tarjetas-primero",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

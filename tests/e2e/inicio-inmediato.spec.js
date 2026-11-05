@@ -189,11 +189,11 @@ test.describe('PWA Android fría y caliente', () => {
       }
     });
     await expect.poll(() => page.evaluate(async () => {
-      const cache = await caches.open('appi-v918-inicio-inmediato');
+      const cache = await caches.open('appi-v919-tarjetas-primero');
       return !!(await cache.match('./index.html')) && !!(await cache.match('./data-sync.js'));
     }), { timeout: 15000 }).toBe(true);
     const optionalBeforeWarm = await page.evaluate(async () => {
-      const cache = await caches.open('appi-v918-inicio-inmediato');
+      const cache = await caches.open('appi-v919-tarjetas-primero');
       return !!(await cache.match('./vendor/xlsx.full.min.js')) || !!(await cache.match('./vendor/pdf.min.js'));
     });
     expect(optionalBeforeWarm).toBe(false);
