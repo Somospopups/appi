@@ -1,7 +1,9 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect, devices } = require('@playwright/test');
 const fs = require('fs');
 
 const read = file => fs.readFileSync(file, 'utf8');
+const androidPhone = { ...devices['Pixel 5'] };
+delete androidPhone.defaultBrowserType;
 
 test('la versión visible, el paquete y el Service Worker están alineados', () => {
   const html=read('index.html'),sw=read('service-worker.js'),pkg=JSON.parse(read('package.json'));
@@ -63,6 +65,53 @@ test('el agua de carga se anima con CSS y no pide fotos estáticas', async ({ pa
   expect(fondo).not.toMatch(/url\(/);
   await expect.poll(() => page.locator('#bootScreen').evaluate(el => el.classList.contains('fill'))).toBe(true);
   expect(fotos, `El arranque pidió fotos: ${fotos.join(', ')}`).toEqual([]);
+});
+
+test('Android dibuja APPI aunque las hojas externas queden esperando', async ({ page }) => {
+  await page.route(/appi-(gotita|progreso|assistant|tour)\.css/, async route => {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    await route.abort('timedout');
+  });
+  const started=Date.now();
+  await page.goto('/index.html', { waitUntil: 'commit' });
+  await expect(page.locator('#bootScreen')).toBeVisible({ timeout: 2000 });
+  expect(Date.now()-started).toBeLessThan(2000);
+});
+
+test('el inicio móvil no queda bloqueado por red ni por estilos externos', () => {
+  const html=read('index.html'),sw=read('service-worker.js');
+  expect(sw).toContain("const CORE_SHELL = ['./', './index.html', './manifest.json']");
+  expect(sw).toContain('fetchWithTimeout(event.request, 7000)');
+  expect(sw).toContain("const cached = await caches.match('./index.html') || await caches.match('./')");
+  expect(sw).toContain("caches.match(event.request, { ignoreSearch: true })");
+  expect(sw).toContain('event.waitUntil(fresh.then(() => undefined, () => undefined))');
+  for(const file of ['appi-gotita.css','appi-progreso.css','appi-assistant.css','appi-tour.css']){
+    expect(html).toMatch(new RegExp(`<link rel="stylesheet" href="\\./${file.replace('.','\\.')}\\?v=\\d+" media="print" onload="this\\.media='all'">`));
+  }
+});
+
+test.describe('arranque PWA real en Android', () => {
+  test.use({ ...androidPhone, serviceWorkers: 'allow' });
+
+  test('la copia instalada abre aun cuando el teléfono queda sin red', async ({ page, context }) => {
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) {
+        await new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
+      }
+    });
+    await expect.poll(() => page.evaluate(async () => {
+      const cache=await caches.open('appi-v917-inicio-movil');
+      return !!(await cache.match('./index.html'));
+    }), { timeout: 15000 }).toBe(true);
+
+    await context.setOffline(true);
+    const started=Date.now();
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: 7000 });
+    expect(Date.now()-started).toBeLessThan(7000);
+    await expect(page.locator('#bootScreen, #authScreen').first()).toBeVisible();
+  });
 });
 
 test('el App Shell sólo referencia archivos existentes e incluye los módulos activos', () => {

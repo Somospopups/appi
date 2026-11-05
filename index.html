@@ -161,13 +161,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=914"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=914"></script>
+  <script src="./campus-psa.js?v=917"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=915"></script>
+<script src="./lista-precios.js?v=917"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4665,15 +4665,17 @@ html body .lp-fab{
 }
 </style>
 
-<link rel="stylesheet" href="./appi-gotita.css?v=915">
-<link rel="stylesheet" href="./appi-progreso.css?v=916">
-<link rel="stylesheet" href="./appi-assistant.css?v=915">
-<link rel="stylesheet" href="./appi-tour.css?v=914">
-<script src="./appi-gotita.js?v=915" defer></script>
-<script src="./appi-progreso.js?v=916" defer></script>
-<script src="./appi-assistant.js?v=915" defer></script>
-<script src="./appi-buscar.js?v=915" defer></script>
-<script src="./appi-tour.js?v=915" defer></script>
+<!-- No bloquear el primer dibujo de Android por una hoja externa: el estilo
+     principal ya está inline y estos módulos se aplican apenas llegan. -->
+<link rel="stylesheet" href="./appi-gotita.css?v=917" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-progreso.css?v=917" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-assistant.css?v=917" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="./appi-tour.css?v=917" media="print" onload="this.media='all'">
+<script src="./appi-gotita.js?v=917" defer></script>
+<script src="./appi-progreso.js?v=917" defer></script>
+<script src="./appi-assistant.js?v=917" defer></script>
+<script src="./appi-buscar.js?v=917" defer></script>
+<script src="./appi-tour.js?v=917" defer></script>
 </head>
 <body>
 
@@ -4787,7 +4789,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v916 · Segura</div>
+  <div class="ds-foot">APPI · v917 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14522,8 +14524,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='916';
-    const CACHE_NAME='appi-v916-arranque-rapido';
+    const swVersion='917';
+    const CACHE_NAME='appi-v917-inicio-movil';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

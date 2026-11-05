@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v917 · Inicio móvil protegido
+
+- **La app instalada en Android ya no espera indefinidamente a la red:** el Service Worker entrega de inmediato el HTML guardado y actualiza la copia en segundo plano.
+- Scripts y estilos disponibles en caché se sirven primero, incluso cuando el teléfono muestra señal pero la conexión no responde.
+- Las cuatro hojas de estilo de Appi dejaron de bloquear el primer dibujo: Android abandona su splash nativo y muestra el arranque real de APPI sin esperar esos archivos.
+- Toda solicitud de red del arranque tiene un límite; si no existe una copia local, APPI muestra una explicación en vez de quedar congelada.
+- Una actualización sólo reemplaza la versión anterior cuando el HTML de inicio quedó guardado correctamente.
+- Se agregó una prueba PWA real: instala el Service Worker, corta por completo la conexión y exige que APPI vuelva a abrir desde su copia local.
+- Versión: **v917 · Segura** → Cache `appi-v917-inicio-movil`.
+
 ## v916 · Arranque rápido y protección para cuentas grandes
 
 - **Mi avance ya no compite con el inicio de APPI:** el login, la sincronización inicial y el primer render terminan antes de calcular el progreso comercial.

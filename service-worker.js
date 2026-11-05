@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v916-arranque-rapido';
+const CACHE_NAME = 'appi-v917-inicio-movil';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -98,19 +98,35 @@ const APP_SHELL = [
 ];
 
 self.addEventListener('message', event=>{ if(event.data && event.data.type==='SKIP_WAITING') self.skipWaiting(); });
+const CORE_SHELL = ['./', './index.html', './manifest.json'];
+
+async function fetchWithTimeout(request, timeoutMs = 7000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(request, { cache: 'no-store', signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => Promise.all(APP_SHELL.map(async url => {
-        try {
-          const response = await fetch(url, { cache: 'no-store' });
-          if (response.ok) await cache.put(url, response);
-        } catch (error) {
-          // Un recurso opcional no debe impedir instalar el resto de la app.
-        }
-      })))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    // El HTML es obligatorio: una actualización incompleta nunca debe borrar la
+    // última versión que sí arrancaba. Los demás recursos se pueden completar
+    // en segundo plano o durante el uso.
+    for (const url of CORE_SHELL) {
+      const response = await fetchWithTimeout(url, 10000);
+      if (!response.ok) throw new Error(`No se pudo guardar el inicio: ${url}`);
+      await cache.put(url, response);
+    }
+    await Promise.allSettled(APP_SHELL.filter(url => !CORE_SHELL.includes(url)).map(async url => {
+      const response = await fetchWithTimeout(url, 10000);
+      if (response.ok) await cache.put(url, response);
+    }));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
@@ -200,37 +216,57 @@ self.addEventListener('fetch', event => {
   }
 
   if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request, { cache: 'no-store' })
-        .then(response => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
-          }
-          return response;
-        })
-        .catch(() => caches.match('./index.html'))
-    );
+    // La pantalla nativa de Android no puede quedar esperando una red móvil que
+    // parece conectada pero no responde. Servimos el HTML guardado de inmediato
+    // y lo renovamos detrás; sin copia, la red tiene un límite estricto.
+    const fresh = (async () => {
+      const response = await fetchWithTimeout(event.request, 7000);
+      if (!response.ok) throw new Error(`Navegación ${response.status}`);
+      const cache = await caches.open(CACHE_NAME);
+      await Promise.all([
+        cache.put('./index.html', response.clone()),
+        cache.put('./', response.clone())
+      ]);
+      return response;
+    })();
+    event.waitUntil(fresh.then(() => undefined, () => undefined));
+    event.respondWith((async () => {
+      const cached = await caches.match('./index.html') || await caches.match('./');
+      if (cached) return cached;
+      try { return await fresh; }
+      catch (error) {
+        return new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>body{margin:0;background:#06172d;color:#fff;font:600 16px system-ui;display:grid;place-items:center;min-height:100vh;text-align:center;padding:24px;box-sizing:border-box}</style><div><b>APPI</b><p>No pudimos abrir la copia guardada.<br>Revisá la conexión y volvé a intentar.</p></div>', {
+          status: 503,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' }
+        });
+      }
+    })());
     return;
   }
 
-  event.respondWith(
-    fetch(event.request, { cache: 'no-store' })
-      .then(response => {
-        if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-        }
-        return response;
-      })
-      .catch(async () => {
-        const cached = await caches.match(event.request);
-        return cached || new Response('Recurso no disponible sin conexión.', {
-          status: 503,
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-        });
-      })
-  );
+  // Scripts y estilos guardados se entregan primero. Esto evita que cuatro
+  // hojas de estilo bloqueen el primer dibujo y dejen visible para siempre el
+  // splash nativo de Android. La red los actualiza sin frenar la apertura.
+  const fresh = (async () => {
+    const response = await fetchWithTimeout(event.request, 7000);
+    if (response.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(event.request, response.clone());
+    }
+    return response;
+  })();
+  event.waitUntil(fresh.then(() => undefined, () => undefined));
+  event.respondWith((async () => {
+    const cached = await caches.match(event.request, { ignoreSearch: true });
+    if (cached) return cached;
+    try { return await fresh; }
+    catch (error) {
+      return new Response('Recurso no disponible sin conexión.', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+      });
+    }
+  })());
 });
 
 
