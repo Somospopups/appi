@@ -62,6 +62,12 @@ URLS = {
 
 MESES = ("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
 CTX = ssl.create_default_context()
+
+# Datos que no tienen una fuente automatizada dentro de este script (ganancias,
+# ingreso) o que se regeneran por otro path: si quedan más viejos que este
+# número de días, el script falla de calle para que un dato vencido no se
+# publique en silencio. La financiación tiene su propia revisión por edición.
+DIAS_FRESCURA = 30
 GRUPO_ORDEN = {"equipos": 0, "recargas": 1, "griferia": 2, "botellas": 3, "otros": 4}
 
 # Canal @PSAPurificadores. El primero que matchea gana.
@@ -175,6 +181,86 @@ def verificar_videos(productos):
 def fecha_ar(now=None):
     d = now or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
     return f"{d.day}-{MESES[d.month - 1]}-{d.year}"
+
+
+def _parse_fecha_ar(s):
+    """Parsea 'DD-Mes-YYYY' (la formato usado por fecha_ar) a datetime."""
+    m = re.match(r"\s*(\d{1,2})-([A-Za-z]{3,9})-(\d{4})\s*$", str(s or ""))
+    if not m:
+        return None
+    dia, mes, anio = int(m.group(1)), m.group(2).title(), int(m.group(3))
+    for i, nombre in enumerate(MESES):
+        if nombre.lower() == mes.lower():
+            mes = i + 1
+            break
+    else:
+        return None
+    try:
+        return datetime(anio, mes, dia, tzinfo=ZoneInfo("America/Argentina/Buenos_Aires"))
+    except ValueError:
+        return None
+
+
+def dias_desde_fecha(s, ahora=None):
+    """Días entre la fecha 's' (formato DD-Mes-YYYY) y ahora. None si no parsea."""
+    d = _parse_fecha_ar(s)
+    if d is None:
+        return None
+    a = ahora or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
+    return (a - d).days
+
+
+def verificar_frescura(path, clave_fecha="actualizado", maximo=DIAS_FRESCURA, etiqueta=""):
+    """Falla si el archivo JSON tiene una fecha de actualización demasiado vieja.
+
+    Los datos sin fuente automatizada en este script (ganancias, ingreso) no se
+    refuerzan por el scrape de la tienda: si quedan estancados más allá del
+    umbral, el workflow debe verse en rojo para que se regeneren en vez de
+    seguir publicándose como si estuvieran vigentes.
+    """
+    label = etiqueta or path.name
+    if not path.exists():
+        raise SystemExit(
+            f"frescura: falta {label} ({path}). No hay dato para publicar."
+        )
+    try:
+        datos = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise SystemExit(f"frescura: {label} ilegible: {e}")
+    raw = (datos or {}).get(clave_fecha) if isinstance(datos, dict) else None
+    dias = dias_desde_fecha(raw)
+    if dias is None:
+        raise SystemExit(
+            f"frescura: {label} no tiene fecha '{clave_fecha}' válida "
+            f"(encontró {raw!r}); no se puede verificar su vigencia."
+        )
+    if dias > maximo:
+        raise SystemExit(
+            f"frescura: {label} está vencido: {raw} ({dias} días > {maximo}). "
+            f"Regenerar el dato antes de publicar."
+        )
+    print(f"frescura ok: {label} ({raw}, {dias} días)")
+
+
+def verificar_ganancias():
+    """psa-ganancias.json se regenera con tools/build-ganancias-psa.py, que no
+    corre en este script. Vigila su frescura para que un listado vencido no se
+    publique en silencio."""
+    verificar_frescura(ROOT / "psa-ganancias.json", etiqueta="psa-ganancias.json")
+
+
+def verificar_ingreso(productos):
+    """Las opciones de ingreso son datos curados (grupo='ingreso') sin fuente
+    automatizada pública. Vigila que el catálogo que las contiene esté fresco
+    y que el grupo siga presente; si el catálogo quedó retenido de una edición
+    anterior, el dato vencido no debe publicarse en silencio."""
+    ingreso = [p for p in productos if (p.get("grupo") or "") == "ingreso"]
+    if not ingreso:
+        raise SystemExit(
+            "frescura: catálogo sin opciones de ingreso (grupo='ingreso'). "
+            "El conjunto curado se perdió; no publicar sin ingreso."
+        )
+    print(f"frescura ok: ingreso ({len(ingreso)} opciones)")
 
 
 def get(url, data=None, headers=None, timeout=40):
@@ -868,18 +954,34 @@ def main():
         encoding="utf-8",
     )
     OUT_BEN.write_text(json.dumps(CYBER_2026, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    # Frescura de datos sin fuente automatizada aquí (ganancias) y del conjunto
+    # curado de ingreso. Cualquier vencimiento falla el script de calle para no
+    # publicar datos viejos en silencio, igual que la financiación no auditada.
+    verificar_ganancias()
+    verificar_ingreso(productos)
     try:
         planes = extraer_planes()
         planes["actualizado"] = fecha
         OUT_PLAN.write_text(json.dumps(planes, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"planes {len(planes.get('bancos') or [])} bancos · vigencia {planes.get('vigencia') or '—'}")
     except Exception as e:
-        print(f"planes no disponibles: {e}")
-        if not OUT_PLAN.exists():
+        # Una edición de financiación nueva que no está auditada en
+        # planes-psa-verificados.json NO se publica a medias ni se encubre con
+        # éxito. Si ya hay un plan verificado previo se conserva para que el
+        # frontend no pierda el último plan válido, pero el script falla de
+        # calle: el workflow queda en rojo y el dato vencido no se publica.
+        if OUT_PLAN.exists():
+            print(f"planes no disponibles: {e} (se conserva el último plan verificado en {OUT_PLAN.name})")
+        else:
             OUT_PLAN.write_text(
-                json.dumps({"actualizado": fecha, "vigencia": "", "cuotas": [3, 6, 9, 12, 15, 18], "bancos": []}, ensure_ascii=False, indent=2) + "\n",
+                json.dumps({"actualizado": fecha, "vigencia": "", "cuotas": [3, 6, 9, 12, 15, 18], "bancos": [], "estado": "sin-plan-auditado"}, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
+            print(f"planes no disponibles: {e} (no hay plan previo; se escribió estado 'sin-plan-auditado')")
+        raise SystemExit(
+            f"financiación no auditable: {e}. Revisá y agregá la edición nueva a "
+            f"{PLANES_VERIFICADOS.relative_to(ROOT)} para que el workflow vuelva a publicar."
+        )
     print(f"ok {len(productos)} productos · {len(precios)} cotejo · {fecha}")
 
 

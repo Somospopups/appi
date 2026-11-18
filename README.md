@@ -1,5 +1,14 @@
 # APPI
 
+## v920 · Financiación auditada y guardas de frescura (no más datos vencidos en silencio)
+
+- **Financiación:** el actualizador ahora **falla de calle** cuando PSA publica una edición de financiación nueva que no está auditada en `scripts/planes-psa-verificados.json`, en vez de conservar la tabla vencida y reportar éxito. El workflow queda en rojo hasta que se audita la nueva edición, así un dato vencido no se publica en silencio.
+- Se audita y registra la edición oficial **16-Nov-2026** (vigencia 12 al 23 de noviembre): Cuota Simple, Naranja X, Galicia, Banco Provincia y Credicoop/Cabal, con sus cuotas y BIN participantes tomados del PDF legal. Los bancos cuya cantidad de cuotas no aparece explícitamente en esa pieza legal (BBVA, Nación, Macro, Santander, Hipotecario, American Express) **no se anuncian con cuotas inventadas**; quedan documentados en la nota de auditoría hasta verificar su pieza bancaria específica.
+- **Ganancias:** `psa-ganancias.json` se regenera en el workflow con `tools/build-ganancias-psa.py` antes del updater, y el updater revisa su frescura: si queda vencido más de 30 días, falla en vez de publicarlo en silencio.
+- **Ingreso:** se agrega una guarda de frescura sobre el conjunto curado de las 22 opciones de ingreso (`grupo: ingreso`); si el catálogo que las contiene se retiene de una edición anterior o se pierde el grupo, el updater falla en vez de publicar datos vencidos.
+- El workflow publica también `psa-ganancias.json` y corre la prueba de guardas (`tests/actualizar-precios-psa.test.py`) como parte del runner.
+- Versión: **v920 · Segura** → Cache `appi-v920-financiacion-auditada`.
+
 ## v919 · Tarjetas primero
 
 - Las tarjetas inteligentes del Home son lo primero que aparece: ya no esperan a la nube.

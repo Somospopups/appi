@@ -1,61 +1,60 @@
 {
-  "actualizado": "5-Nov-2026",
-  "vigencia": "2-Nov-2026 al 11-Nov-2026",
+  "actualizado": "18-Nov-2026",
+  "vigencia": "12-Nov-2026 al 23-Nov-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
-  "fuente_legal": "https://contenidos.psa.com.ar/uploads/legales-financiacion-vigencia_2-11-2026.pdf",
+  "fuente_legal": "https://contenidos.psa.com.ar/uploads/legales-financiacion-vigencia_16-11-2026.pdf",
   "fuente_imagenes": [
-    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales_66.jpg",
-    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales_67.jpg",
-    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales-2_35.jpg",
-    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales-2_36.jpg",
-    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas_Provinciales_nuevas_Usuario_PSAAccion_1.jpg",
-    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas_Provinciales_nuevas_Usuario_PSAAccion_2.jpg"
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales_81.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales_82.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales-2_47.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales-2_48.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas_Provinciales_nuevas_Usuario_PSAAccion_3.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas_Provinciales_nuevas_Usuario_PSAAccion_4.jpg"
   ],
+  "fuente_actualizacion": "Piezas oficiales PSA · edición 16-Nov-2026 auditada del PDF legal",
   "cuotas": [
     3,
     6,
     9,
     12,
     15,
-    18,
-    24
+    18
   ],
   "bancos": [
     {
-      "id": "tarjeta-naranja",
-      "nombre": "Naranja X",
-      "cuotas": [
-        6,
-        9,
-        12,
-        18
-      ],
-      "tarjetas": "Naranja X",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-08",
-      "vigencia": "2 al 8 de noviembre de 2026",
-      "beneficio": "6, 9, 12 y 18 cuotas sin interés, además de Plan Z",
-      "canal": "ATM > Link de Pago",
-      "condiciones": "No participan tarjetas cuya numeración comience con 402917 o 402918."
-    },
-    {
-      "id": "macro",
-      "nombre": "Macro",
+      "id": "cuota-simple",
+      "nombre": "Cuota Simple",
       "cuotas": [
         3,
         6,
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
-      "tarjetas": "Visa, Mastercard y American Express",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-08",
-      "vigencia": "2 al 8 de noviembre de 2026",
-      "beneficio": "3, 6, 9, 12, 15, 18 y 24 cuotas sin interés",
-      "canal": "Exclusivo a través de MODO"
+      "tarjetas": "Visa, Mastercard y Cordobesa Mastercard",
+      "desde": "2026-11-12",
+      "hasta": "2026-11-23",
+      "vigencia": "12 al 23 de noviembre de 2026",
+      "beneficio": "3, 6, 9, 12, 15 y 18 cuotas sin interés",
+      "canal": "Exclusivo a través de MODO",
+      "condiciones": "Visa/Mastercard solo emitidas por entidades bancarias (banca personal, empresas, corporate y business). Cordobesa: solo Mastercard cuyo número empiece con 542702, 544764 o 550073. No aplica a BBVA, Santander, Galicia, BNA, Macro ni Hipotecario."
+    },
+    {
+      "id": "tarjeta-naranja",
+      "nombre": "Naranja X",
+      "cuotas": [
+        6,
+        9,
+        12
+      ],
+      "tarjetas": "Naranja X",
+      "desde": "2026-11-16",
+      "hasta": "2026-11-18",
+      "vigencia": "16 al 18 de noviembre de 2026",
+      "beneficio": "12 cuotas sin interés + 10% off sin tope de reintegro; también 6 y 9 cuotas sin interés y plan Zeta",
+      "canal": "Solo medios de pago online (ATM > Link de Pago)",
+      "condiciones": "El reintegro del 10% aplica a las 12 cuotas. No participan tarjetas que empiecen con 402917 o 402918."
     },
     {
       "id": "banco-galicia",
@@ -67,11 +66,12 @@
         12
       ],
       "tarjetas": "Visa, Mastercard y American Express",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-10",
-      "vigencia": "2 al 10 de noviembre de 2026",
-      "beneficio": "3, 6, 9 y 12 cuotas sin interés + 10% de reintegro sin tope",
-      "canal": "Exclusivo a través de MODO"
+      "desde": "2026-11-12",
+      "hasta": "2026-11-23",
+      "vigencia": "12 al 23 de noviembre de 2026",
+      "beneficio": "3, 6, 9 y 12 cuotas sin interés",
+      "canal": "Exclusivo a través de MODO",
+      "condiciones": "BIN participantes: 454640, 454641, 454642, 433830, 459354, 371593, 377797, 377796, 377795, 549416, 549427, 545652, 523937, 550568, 425821, 425822, 450910, 455349, 459473, 465403, 469724, 472039, 450911, 490699, 492043, 492137, 536087, 554999, 553638, 525489, 524702, 525692, 377804, 370399, 377802, 377803."
     },
     {
       "id": "banco-provincia",
@@ -85,110 +85,12 @@
         18
       ],
       "tarjetas": "Visa y Mastercard",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-11",
-      "vigencia": "2 al 11 de noviembre de 2026",
-      "beneficio": "3, 6, 9, 12 y 15 cuotas sin interés; o 18 cuotas sin interés + 10% de reintegro sin tope",
-      "canal": "Según condiciones de la promoción oficial"
-    },
-    {
-      "id": "american-express",
-      "nombre": "American Express",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12
-      ],
-      "tarjetas": "Tarjetas emitidas directamente por American Express",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-11",
-      "vigencia": "2 al 11 de noviembre de 2026",
-      "beneficio": "3, 6, 9 y 12 cuotas sin interés",
-      "canal": "Medios habilitados por PSA"
-    },
-    {
-      "id": "bbva",
-      "nombre": "BBVA",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12
-      ],
-      "tarjetas": "Visa y Mastercard BBVA",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-11",
-      "vigencia": "2 al 11 de noviembre de 2026",
-      "beneficio": "3, 6, 9 y 12 cuotas sin interés",
-      "canal": "Exclusivo a través de MODO"
-    },
-    {
-      "id": "cuota-simple",
-      "nombre": "Cuota Simple",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12,
-        15,
-        18
-      ],
-      "tarjetas": "Visa, Mastercard y Cordobesa Mastercard",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-11",
-      "vigencia": "2 al 11 de noviembre de 2026",
+      "desde": "2026-11-12",
+      "hasta": "2026-11-23",
+      "vigencia": "12 al 23 de noviembre de 2026",
       "beneficio": "3, 6, 9, 12, 15 y 18 cuotas sin interés",
-      "canal": "Exclusivo a través de MODO",
-      "condiciones": "No aplica a tarjetas emitidas por BBVA, Santander, Galicia, Banco Nación, Macro ni Hipotecario."
-    },
-    {
-      "id": "banco-nacion",
-      "nombre": "Nación",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12,
-        15,
-        18
-      ],
-      "tarjetas": "Visa y Mastercard Banco Nación",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-11",
-      "vigencia": "2 al 11 de noviembre de 2026",
-      "beneficio": "3, 6, 9, 12, 15 y 18 cuotas sin interés",
-      "canal": "Exclusivo a través de MODO"
-    },
-    {
-      "id": "santander",
-      "nombre": "Santander",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12
-      ],
-      "tarjetas": "Visa, Mastercard y American Express Santander",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-11",
-      "vigencia": "2 al 11 de noviembre de 2026",
-      "beneficio": "3, 6, 9 y 12 cuotas sin interés",
-      "canal": "Exclusivo a través de MODO"
-    },
-    {
-      "id": "hipotecario",
-      "nombre": "Hipotecario",
-      "cuotas": [
-        9,
-        12
-      ],
-      "tarjetas": "Visa y Mastercard Hipotecario",
-      "desde": "2026-11-02",
-      "hasta": "2026-11-11",
-      "vigencia": "2 al 11 de noviembre de 2026",
-      "beneficio": "9 y 12 cuotas sin interés",
-      "canal": "Exclusivo a través de MODO"
+      "canal": "CABA, Gran Buenos Aires y Provincia de Buenos Aires",
+      "condiciones": "Se excluyen Visa Regalo, Visa Recargable, Visa Corporate, Visa Business y Visa Purchasing. BIN participantes: 541719, 541646, 548790, 557497, 553668, 527613, 454832, 454850, 451275, 454846, 489321."
     },
     {
       "id": "cabal",
@@ -201,13 +103,11 @@
         18
       ],
       "tarjetas": "Cabal emitida por Banco Credicoop",
-      "desde": "2026-11-05",
-      "hasta": "2026-11-11",
-      "vigencia": "5 al 11 de noviembre de 2026",
+      "desde": "2026-11-12",
+      "hasta": "2026-11-23",
+      "vigencia": "12 al 23 de noviembre de 2026",
       "beneficio": "3, 6, 9, 12 y 18 cuotas sin interés",
-      "canal": "Exclusivo a través de MODO",
-      "condiciones": "Promoción vigente desde el 5 de noviembre; no incluye reintegro."
+      "canal": "Exclusivo a través de MODO"
     }
-  ],
-  "fuente_actualizacion": "Piezas oficiales PSA CyberWeek recibidas el 5-Nov-2026"
+  ]
 }
